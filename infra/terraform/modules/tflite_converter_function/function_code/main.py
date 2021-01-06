@@ -20,7 +20,7 @@ def model_converter(request):
     source_bucket = os.getenv('SOURCE_BUCKET')
     destination_bucket = os.getenv('DESTINATION_BUCKET')
 
-    tf_source_bucket = storage_client.bucket("kube-edge-demo-tf-saved-models")
+    tf_source_bucket = storage_client.bucket(source_bucket)
     tflite_destination_bucket = storage_client.bucket(destination_bucket)
 
     blobs = tf_source_bucket.list_blobs(prefix=saved_model_dir_gcs)  # Get list of files

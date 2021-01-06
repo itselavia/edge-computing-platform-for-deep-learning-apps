@@ -4,19 +4,17 @@ provider "google" {
   region      = var.region
   zone        = var.zone
 }
-
+/*
 module "config_bucket" {
   source       = "./modules/config_bucket"
   project_name = var.project_name
 }
-/*
+
 module "vpc" {
   source   = "./modules/vpc"
   vpc_name = var.vpc_name
   region   = var.region
 }
-
-
 
 module "kubernetes" {
   source                = "./modules/kubernetes"
@@ -34,10 +32,15 @@ module "kubeedge" {
   zone                  = var.zone
   subnetwork_name       = module.vpc.subnetwork_2_name
   edge_node_count = var.edge_node_count
-} */
+} 
 
 module "tflite_converter" {
   source       = "./modules/tflite_converter_function"
   project_name = var.project_name
   config_bucket = module.config_bucket.config_bucket_name
+} */
+
+module "tflite_helm_repo" {
+  source       = "./modules/tflite_helm_repo"
+  project_name = var.project_name
 }

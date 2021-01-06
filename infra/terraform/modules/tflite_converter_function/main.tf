@@ -15,6 +15,13 @@ data "archive_file" "converter_function_zip" {
   output_path = "${path.module}/converter.zip"
 }
 
+resource "null_resource" "delete_converter_zip" {
+  provisioner "local-exec" {
+    when    = destroy
+    command = "rm -rf ${path.module}/converter.zip"
+  }
+}
+
 resource "google_storage_bucket_object" "converter_function_object" {
   name   = "converter.zip"
   bucket = var.config_bucket
@@ -33,7 +40,7 @@ resource "google_cloudfunctions_function" "converter_function" {
   entry_point           = "model_converter"
 
   environment_variables = {
-    SOURCE_BUCKET = google_storage_bucket.tf_saved_models_bucket.name
+    SOURCE_BUCKET      = google_storage_bucket.tf_saved_models_bucket.name
     DESTINATION_BUCKET = google_storage_bucket.tflite_models_bucket.name
   }
 
