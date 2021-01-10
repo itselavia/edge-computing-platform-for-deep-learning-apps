@@ -5,3 +5,5 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 - Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM
 - Install helm v3
 - Install gsutil
+- Login to DockerHub account
+- Install realpath (Command for MacOS - brew install coreutils)

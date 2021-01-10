@@ -1,4 +1,3 @@
-
 resource "google_storage_bucket" "tf_saved_models_bucket" {
   name          = "${var.project_name}-tf-saved-models"
   force_destroy = true
@@ -18,7 +17,7 @@ data "archive_file" "converter_function_zip" {
 resource "null_resource" "delete_converter_zip" {
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf ${path.module}/converter.zip"
+    command = "rm -f ${path.module}/converter.zip"
   }
 }
 

@@ -20,7 +20,7 @@ data "template_file" "controlplane_init" {
   vars = {
     kubeadm_token     = "${random_string.token_part_1.result}.${random_string.token_part_2.result}"
     config_bucket_url = var.config_bucket
-  }
+   }
 }
 
 data "template_file" "worker_init" {
@@ -94,4 +94,15 @@ resource "google_compute_instance" "k8s_workers" {
   }
 
   metadata_startup_script = data.template_file.worker_init.rendered
+}
+
+resource "null_resource" "download_kube_config" {
+  provisioner "local-exec" {
+    command = "sh ${path.module}/scripts/download_kube_config.sh ${var.config_bucket} ${path.module}"
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+    command = "rm -f ${path.module}/output.log ${path.module}/env_output.log ${path.module}/config"
+  }
 }

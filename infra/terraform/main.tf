@@ -4,7 +4,7 @@ provider "google" {
   region      = var.region
   zone        = var.zone
 }
-/*
+
 module "config_bucket" {
   source       = "./modules/config_bucket"
   project_name = var.project_name
@@ -38,7 +38,7 @@ module "tflite_converter" {
   source       = "./modules/tflite_converter_function"
   project_name = var.project_name
   config_bucket = module.config_bucket.config_bucket_name
-} */
+}
 
 module "tflite_helm_repo" {
   source       = "./modules/tflite_helm_repo"

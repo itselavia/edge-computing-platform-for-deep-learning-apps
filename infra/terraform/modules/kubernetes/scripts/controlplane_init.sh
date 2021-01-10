@@ -30,7 +30,7 @@ add-apt-repository \
    stable"
 
 apt-get update 
-apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-bionic docker-ce-cli=5:19.03.14~3-0~ubuntu-bionic containerd.io
 
 # Installing kubeadm, kubelet and kubectl 
 apt-get update &&  apt-get install -y apt-transport-https curl
@@ -42,8 +42,10 @@ apt-get update
 apt-get install -y kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
 
+PUBLIC_IP=$(curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip")
+
 # Initialize the Kubernetes control plane
-kubeadm init --token ${kubeadm_token} --pod-network-cidr=10.244.0.0/16
+kubeadm init --token ${kubeadm_token} --pod-network-cidr=10.244.0.0/16 --control-plane-endpoint $PUBLIC_IP
 
 # Copy the kube config to default location and GCS
 mkdir -p /root/.kube

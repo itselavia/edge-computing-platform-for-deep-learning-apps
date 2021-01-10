@@ -30,7 +30,7 @@ add-apt-repository \
    stable"
 
 apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io
+apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-bionic docker-ce-cli=5:19.03.14~3-0~ubuntu-bionic containerd.io
 
 # Installing kubeadm, kubelet and kubectl 
 apt-get update && apt-get install -y apt-transport-https curl
