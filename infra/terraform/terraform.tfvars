@@ -1,7 +1,7 @@
 region                    = "us-west2"
 vpc_name                  = "masters-295a"
 zone                      = "us-west2-a"
-project_name              = "kube-edge-demo"
+project_name              = "edge-platform-cmpe-295b"
 k8s_worker_node_count     = 1
 edge_node_count           = 1
-credentials_file_location = "~/Downloads/kube-edge-demo-186a8609c6e1.json"
+credentials_file_location = "~/Downloads/edge-platform-cmpe-295b-e00bfe08b748.json"

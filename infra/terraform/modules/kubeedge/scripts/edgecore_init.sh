@@ -25,8 +25,8 @@ apt-get update
 apt-get install -y docker-ce=5:19.03.14~3-0~ubuntu-bionic docker-ce-cli=5:19.03.14~3-0~ubuntu-bionic containerd.io
 
 # Download keadm
-KEADM_VERSION=keadm-v1.4.0-linux-amd64
-wget https://github.com/kubeedge/kubeedge/releases/download/v1.4.0/$KEADM_VERSION.tar.gz
+KEADM_VERSION=keadm-v1.5.0-linux-amd64
+wget  --quiet https://github.com/kubeedge/kubeedge/releases/download/v1.5.0/$KEADM_VERSION.tar.gz
 tar -xvzf $KEADM_VERSION.tar.gz
 mv $KEADM_VERSION/keadm/keadm /usr/local/bin/
 rm -rf $KEADM_VERSION $KEADM_VERSION.tar.gz
@@ -41,4 +41,7 @@ done
 gsutil cp ${config_bucket_url}/keadm_token ./keadm_token
 
 KEADM_TOKEN=$(cat ./keadm_token)
+
+# Running the join command twice. this is a workaround for a bug which will be resolved in v1.5.1
+keadm join --cloudcore-ipport=${cloudcore_ip}:10000 --token=$KEADM_TOKEN
 keadm join --cloudcore-ipport=${cloudcore_ip}:10000 --token=$KEADM_TOKEN
