@@ -16,18 +16,18 @@ resource "random_string" "token_part_2" {
 }
 
 data "template_file" "controlplane_init" {
-  template = "${file("${path.module}/scripts/controlplane_init.sh")}"
+  template = file("${path.module}/scripts/controlplane_init.sh")
   vars = {
     kubeadm_token     = "${random_string.token_part_1.result}.${random_string.token_part_2.result}"
     config_bucket_url = var.config_bucket
-   }
+  }
 }
 
 data "template_file" "worker_init" {
-  template = "${file("${path.module}/scripts/worker_init.sh")}"
+  template = file("${path.module}/scripts/worker_init.sh")
   vars = {
     kubeadm_token   = "${random_string.token_part_1.result}.${random_string.token_part_2.result}"
-    controlplane_ip = "${google_compute_instance.k8s_controlplane.network_interface.0.access_config.0.nat_ip}"
+    controlplane_ip = google_compute_instance.k8s_controlplane.network_interface.0.access_config.0.nat_ip
   }
 }
 
@@ -57,7 +57,7 @@ resource "google_compute_instance" "k8s_controlplane" {
   }
 
   metadata = {
-    ssh-keys = "akshay:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("~/.ssh/id_rsa.pub")}"
   }
 
   metadata_startup_script = data.template_file.controlplane_init.rendered
@@ -90,7 +90,7 @@ resource "google_compute_instance" "k8s_workers" {
   }
 
   metadata = {
-    ssh-keys = "akshay:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("~/.ssh/id_rsa.pub")}"
   }
 
   metadata_startup_script = data.template_file.worker_init.rendered
@@ -102,7 +102,7 @@ resource "null_resource" "download_kube_config" {
   }
 
   provisioner "local-exec" {
-    when = destroy
+    when    = destroy
     command = "rm -f ${path.module}/output.log ${path.module}/env_output.log ${path.module}/config"
   }
 }

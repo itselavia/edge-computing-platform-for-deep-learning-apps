@@ -17,3 +17,7 @@ variable "vpc_name" {
 variable "edge_node_count" {
   type = number
 }
+
+variable "ssh_user" {
+  type = string
+}

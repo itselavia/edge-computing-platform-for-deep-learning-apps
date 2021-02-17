@@ -17,3 +17,7 @@ variable "k8s_worker_node_count" {
 variable "config_bucket" {
   type = string
 }
+
+variable "ssh_user" {
+  type = string
+}

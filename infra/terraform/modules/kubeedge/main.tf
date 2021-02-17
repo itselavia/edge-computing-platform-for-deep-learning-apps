@@ -4,14 +4,14 @@ data "google_compute_image" "ubuntu" {
 }
 
 data "template_file" "cloudcore_init" {
-  template = "${file("${path.module}/scripts/cloudcore_init.sh")}"
+  template = file("${path.module}/scripts/cloudcore_init.sh")
   vars = {
     config_bucket_url = var.config_bucket
   }
 }
 
 data "template_file" "edgecore_init" {
-  template = "${file("${path.module}/scripts/edgecore_init.sh")}"
+  template = file("${path.module}/scripts/edgecore_init.sh")
   vars = {
     config_bucket_url = var.config_bucket
     cloudcore_ip      = google_compute_instance.kubeedge_cloudcore.network_interface.0.access_config.0.nat_ip
@@ -44,7 +44,7 @@ resource "google_compute_instance" "kubeedge_cloudcore" {
   }
 
   metadata = {
-    ssh-keys = "akshay:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("~/.ssh/id_rsa.pub")}"
   }
 
   metadata_startup_script = data.template_file.cloudcore_init.rendered
@@ -77,7 +77,7 @@ resource "google_compute_instance" "kubeedge_edgecore" {
   }
 
   metadata = {
-    ssh-keys = "akshay:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "${var.ssh_user}:${file("~/.ssh/id_rsa.pub")}"
   }
 
   metadata_startup_script = data.template_file.edgecore_init.rendered

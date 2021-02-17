@@ -25,3 +25,7 @@ variable "edge_node_count" {
 variable "credentials_file_location" {
 
 }
+
+variable "ssh_user" {
+  type = string
+}
