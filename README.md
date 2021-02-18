@@ -9,5 +9,7 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 - Login to DockerHub account
 - Install realpath (Command for MacOS - brew install coreutils)
 
+- export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
+
 # Notes:
 - GCP doesn't handle renaming resources well enough. For example, if you're deleting and recreating a service account, it's better to give a new name to the new service account.

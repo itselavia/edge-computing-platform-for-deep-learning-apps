@@ -12,7 +12,3 @@ done
 
 # Download the kube config file
 gsutil cp $1/config $2/config
-
-source $2/scripts/env.sh $2
-
-kubectl config set-context kubernetes-admin@kubernetes

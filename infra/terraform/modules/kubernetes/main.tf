@@ -103,6 +103,6 @@ resource "null_resource" "download_kube_config" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -f ${path.module}/output.log ${path.module}/env_output.log ${path.module}/config"
+    command = "rm -f ${path.module}/output.log ${path.module}/config"
   }
 }
