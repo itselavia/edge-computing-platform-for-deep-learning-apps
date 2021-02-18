@@ -9,6 +9,6 @@ resource "null_resource" "helm_repo_package" {
   }
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -drf ${path.module}/chart_artifact_dir/*"
+    command = "rm -rf ${path.module}/chart_artifact_dir"
   }
 }

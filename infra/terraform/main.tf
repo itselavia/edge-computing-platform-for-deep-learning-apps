@@ -25,7 +25,7 @@ module "kubernetes" {
   config_bucket         = module.config_bucket.config_bucket_url
   ssh_user              = var.ssh_user
 }
-
+/*
 module "kubeedge" {
   source          = "./modules/kubeedge"
   config_bucket   = module.config_bucket.config_bucket_url
@@ -35,7 +35,7 @@ module "kubeedge" {
   edge_node_count = var.edge_node_count
   ssh_user        = var.ssh_user
 }
-
+*/
 module "tflite_converter" {
   source        = "./modules/tflite_converter_function"
   project_name  = var.project_name

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-manager
+  labels:
+    app: model-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: model-manager
+  template:
+    metadata:
+      labels:
+        app: model-manager
+    spec:
+      containers:
+      - name: model-manager
+        image: itselavia/edge-platform-model-manager
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: model-manager-env
+      nodeSelector:
+        type: worker
+      dnsPolicy: Default

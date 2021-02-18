@@ -13,3 +13,7 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 
 # Notes:
 - GCP doesn't handle renaming resources well enough. For example, if you're deleting and recreating a service account, it's better to give a new name to the new service account.
+
+### Miscelleanous commands
+- kubectl label node k8s-worker-0 type=worker
+- curl -X POST "https://us-west2-edge-platform-cmpe-295b.cloudfunctions.net/tf-to-tflite-converter-function" -H "Content-Type:application/json" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
