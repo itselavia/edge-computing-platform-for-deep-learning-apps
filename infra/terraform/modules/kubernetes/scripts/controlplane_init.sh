@@ -39,7 +39,7 @@ cat <<EOF | tee /etc/apt/sources.list.d/kubernetes.list
 deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 apt-get update
-apt-get install -y kubelet kubeadm kubectl
+apt-get install -y kubelet=1.19.8-00 kubeadm=1.19.8-00 kubectl=1.19.8-00
 apt-mark hold kubelet kubeadm kubectl
 
 PUBLIC_IP=$(curl -H "Metadata-Flavor: Google" "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip")

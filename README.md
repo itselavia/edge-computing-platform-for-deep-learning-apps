@@ -17,3 +17,5 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 ### Miscelleanous commands
 - kubectl label node k8s-worker-0 type=worker
 - curl -X POST "https://us-west2-edge-platform-cmpe-295b.cloudfunctions.net/tf-to-tflite-converter-function" -H "Content-Type:application/json" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
+- curl -X POST "http://10.244.1.3:8000/convertModel" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
+- curl -X POST "http://10.244.1.5:8000/deployModel" --data '{"deployment_name":"edge-test-dep", "num_replicas": 1, "tflite_model_folder_name": "sample_tf_model"}'

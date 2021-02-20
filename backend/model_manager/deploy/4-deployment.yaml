@@ -25,3 +25,4 @@ spec:
       nodeSelector:
         type: worker
       dnsPolicy: Default
+      serviceAccount: model-manager
