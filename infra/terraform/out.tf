@@ -17,3 +17,7 @@ output "function_name" {
 output "tflite_bucket" {
   value = module.tflite_converter.tflite_models_bucket
 }
+
+output "database_ip" {
+  value = module.database.database_ip
+}

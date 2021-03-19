@@ -6,3 +6,5 @@ k8s_worker_node_count     = 1
 edge_node_count           = 1
 credentials_file_location = "~/Downloads/edge-platform-cmpe-295b-e00bfe08b748.json"
 ssh_user                  = "akshay"
+db_user_name              = "platform"
+db_password               = "EdgePlatform#Pass_999"

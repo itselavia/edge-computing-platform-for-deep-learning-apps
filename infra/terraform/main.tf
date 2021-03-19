@@ -16,6 +16,13 @@ module "vpc" {
   region   = var.region
 }
 
+module "database" {
+  source       = "./modules/database"
+  db_password  = var.db_password
+  db_user_name = var.db_user_name
+  region       = var.region
+}
+
 module "kubernetes" {
   source                = "./modules/kubernetes"
   vpc_name              = var.vpc_name
