@@ -2,7 +2,7 @@
 This is the code repository for CMPE295 Masters Project. Part of the curriculum for Masters in Software Engineering at San Jose State University.
 
 ### Prerequisites:
-- Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM 
+- Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM, Cloud SQL
 - If you're enabling the APIs for the first time, wait ~20-30 minutes before applying Terraform. The GCP API activation does not take immediate effect
 - Install gsutil
 - Ensure ```make``` is installed 
@@ -48,6 +48,9 @@ export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
 12. Run ```kubectl get nodes``` to see the worker nodes and edge nodes of the cluster
 13. If the nodes are not visible, it’s possible that the cluster setup is still in progress. To view the logs for cluster setup, ssh into the node via the GCP Virtual Machines UI, and tail the /var/log/user-data.log file on any node.
 14. If you want to add or remove any nodes from the existing cluster, simply edit the “terraform.tfvars” file with desired values for variables ```k8s_worker_node_count``` or/and ```edge_node_count``` and run ```make cluster-deploy```
+15. To connect to the MYSQL database from your terminal:
+```mysql --host=`terraform -chdir=infra/terraform output database_ip` --user=USERNAME --password```
+
 ### User Workflow
 ![User Workflow](img/edge-platform-user-workflow-model-deploy.png)
 

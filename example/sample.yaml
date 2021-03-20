@@ -6,4 +6,4 @@ spec:
   containers:
   - image: nginx
     name: sample
-  nodeName: edgecore-1
+  nodeName: edgecore-0

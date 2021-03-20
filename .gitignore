@@ -23,3 +23,6 @@
 *.tfstate
 *.tfstate.*
 *.terraform.lock.hcl*
+
+# Python Virtual Environment
+backend/flask_service/venv

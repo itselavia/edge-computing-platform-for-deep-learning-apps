@@ -16,6 +16,13 @@ module "vpc" {
   region   = var.region
 }
 
+module "database" {
+  source       = "./modules/database"
+  db_password  = var.db_password
+  db_user_name = var.db_user_name
+  region       = var.region
+}
+
 module "kubernetes" {
   source                = "./modules/kubernetes"
   vpc_name              = var.vpc_name
@@ -40,9 +47,4 @@ module "tflite_converter" {
   source        = "./modules/tflite_converter_function"
   project_name  = var.project_name
   config_bucket = module.config_bucket.config_bucket_name
-}
-
-module "tflite_helm_repo" {
-  source       = "./modules/tflite_helm_repo"
-  project_name = var.project_name
 }

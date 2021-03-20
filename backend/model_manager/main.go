@@ -30,6 +30,11 @@ type DeployModelInput struct {
 	FolderName     string `json:"tflite_model_folder_name"`
 }
 
+// NewUserInput holds the structure for input to /createUser
+type NewUserInput struct {
+	UserName string `json:"user_name"`
+}
+
 //IndexHandler for / path
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Alive\n"))
@@ -91,13 +96,7 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("JSON Input incorrect" + err.Error() + "\n"))
 	}
 
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		w.Write([]byte("Unable to create in-cluster config for Kubernetes" + err.Error() + "\n"))
-	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
+	clientset, err := getKubeClientSet()
 	if err != nil {
 		w.Write([]byte("Unable to create clienset for Kubernetes" + err.Error() + "\n"))
 	}
@@ -154,6 +153,57 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Created Deployment successfully: " + result.GetObjectMeta().GetName() + "\n"))
 }
 
+//CreateUserHandler for /createUser path. It creates namespaces and service accounts for new users
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+
+	decoder := json.NewDecoder(r.Body)
+
+	var input NewUserInput
+	err := decoder.Decode(&input)
+
+	if err != nil {
+		w.Write([]byte("JSON Input incorrect" + err.Error() + "\n"))
+	}
+
+	clientset, err := getKubeClientSet()
+	if err != nil {
+		w.Write([]byte("Unable to create clienset for Kubernetes" + err.Error() + "\n"))
+	}
+
+	namespacesClient := clientset.CoreV1().Namespaces()
+
+	namespace := &apiv1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: input.UserName,
+		},
+	}
+
+	result, err := namespacesClient.Create(context.TODO(), namespace, metav1.CreateOptions{})
+
+	if err != nil {
+		w.Write([]byte("Unable to create Namespace for the user: " + input.UserName + " :" + err.Error() + "\n"))
+	}
+
+	w.Write([]byte("Created Namespace successfully: " + result.GetObjectMeta().GetName() + "\n"))
+
+}
+
+func getKubeClientSet() (*kubernetes.Clientset, error) {
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+	// creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, err
+
+	}
+
+	return clientset, nil
+}
+
 func int32Ptr(i int32) *int32 { return &i }
 
 func main() {
@@ -162,6 +212,7 @@ func main() {
 	r.HandleFunc("/", IndexHandler)
 	r.HandleFunc("/convertModel", ConvertModelHandler).Methods("POST")
 	r.HandleFunc("/deployModel", DeployModelHandler).Methods("POST")
+	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST")
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8000", r))

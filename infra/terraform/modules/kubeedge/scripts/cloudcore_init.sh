@@ -25,7 +25,7 @@ rm -rf $KEADM_VERSION $KEADM_VERSION.tar.gz
 # Initialize kubeedge cloudcore
 PUBLIC_IP=$(curl --silent -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)
 
-# Running the init command twice. this is a workaround for a bug which will be resolved in v1.5.1
+# Running the init command twice. this is a workaround for a bug in KubeEdge
 keadm init --advertise-address="$PUBLIC_IP"
 keadm init --advertise-address="$PUBLIC_IP"
 

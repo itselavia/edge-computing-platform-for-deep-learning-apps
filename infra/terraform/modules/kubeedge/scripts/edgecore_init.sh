@@ -42,6 +42,8 @@ gsutil cp ${config_bucket_url}/keadm_token ./keadm_token
 
 KEADM_TOKEN=$(cat ./keadm_token)
 
-# Running the join command twice. this is a workaround for a bug which will be resolved in v1.5.1
+# Running the join command twice. this is a workaround for a bug in KubeEdge
 keadm join --cloudcore-ipport=${cloudcore_ip}:10000 --token=$KEADM_TOKEN
 keadm join --cloudcore-ipport=${cloudcore_ip}:10000 --token=$KEADM_TOKEN
+
+cp /etc/kubeedge/edgecore /usr/local/bin/
