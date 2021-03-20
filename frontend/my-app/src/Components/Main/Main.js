@@ -10,6 +10,8 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Login from "../Login/Login"
 import Register from '../Register/Register';
+import MyProject from '../MyProject/MyProject';
+import Dashboard from '../Dashboard/Dashboard'
 if (localStorage.jwtToken) {
     // Set auth token header auth
     const token = localStorage.jwtToken;
@@ -43,7 +45,8 @@ class Main extends Component {
                     <Route exact path="/" component={Home} />
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/register" component={Register} />
-                    <Route exact path="/addDevice" component={Devices} />
+                    <Route exact path="/projects" component={MyProject} />
+                    <Route exact path="/dashboard" component={Dashboard} />
                     <Route exact path="/viewDevices" component={Devices} />
                 </Switch>
             </React.Fragment>

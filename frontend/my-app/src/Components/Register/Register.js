@@ -11,12 +11,8 @@ class Register extends Component {
     super();
     this.state = {
       email: "",
-      nick_name: "",
-      screen_name: "",
-      address: "",
-      city: "",
-      state: "",
-      zip: "",
+      name: "",
+      phone:"",
       error_message: ""
     };
   }
@@ -42,8 +38,9 @@ class Register extends Component {
   }
 
   componentWillReceiveProps(props) {
-    if (props.auth.user.id && !props.auth.user.email_verified) {
-      this.props.history.push("/verify");
+    if (props.auth.user.userExists/*  && !props.a
+      uth.user.email_verified */) {
+      this.props.history.push("/projects");
     }
     if (props.errors) {
       this.setState({
@@ -73,12 +70,8 @@ class Register extends Component {
 
     const userData = {
       email: this.state.email,
-      screen_name: this.state.screen_name,
-      nick_name: this.state.nick_name,
-      address: this.state.address,
-      city: this.state.city,
-      state: this.state.state,
-      zip: this.state.zip
+      name: this.state.screen_name,
+      phone: this.state.phone
     };
 
     this.props.registerUser(userData);
@@ -106,9 +99,9 @@ class Register extends Component {
 
                 <Form onSubmit={this.onSubmit} autoComplete="off">
                   <Form.Row>
-                    <Form.Group as={Col} controlId="screen_name">
+                    <Form.Group as={Col} controlId="name">
                       <Form.Label><b>Screen Name</b></Form.Label>
-                      <Form.Control name="screen_name"
+                      <Form.Control name="name"
                         type="text"
                         onChange={this.onChange}
                         placeholder="Enter a screen name"
@@ -118,13 +111,13 @@ class Register extends Component {
                   </Form.Row>
 
                   <Form.Row>
-                    <Form.Group as={Col} controlId="nick_name">
-                      <Form.Label><b>Nick Name</b></Form.Label>
-                      <Form.Control name="nick_name"
+                    <Form.Group as={Col} controlId="phone">
+                      <Form.Label><b>Phone</b></Form.Label>
+                      <Form.Control name="phone"
                         type="text"
                         onChange={this.onChange}
-                        placeholder="Enter a nick name"
-                        pattern="^[A-Za-z0-9 ]+$"
+                        placeholder="Enter a phone number"
+                        pattern="^[0-9 ]+$"
                         required />
                     </Form.Group>
                   </Form.Row>
@@ -139,7 +132,7 @@ class Register extends Component {
                     </Form.Group>
                   </Form.Row>
 
-                  <Form.Row>
+                  {/* <Form.Row>
                     <Form.Group as={Col} controlId="address">
                       <Form.Label><b>Street Address</b></Form.Label>
                       <Form.Control name="address"
@@ -183,7 +176,7 @@ class Register extends Component {
                         pattern="^[0-9]{5}$"
                         required />
                     </Form.Group>
-                  </Form.Row>
+                  </Form.Row> */}
 
                   <div className="row">
                     <div className="col-md-12 text-center p-2">
