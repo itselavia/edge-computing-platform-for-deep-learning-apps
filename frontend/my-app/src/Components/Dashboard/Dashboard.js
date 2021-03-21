@@ -3,12 +3,18 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import Form from 'react-bootstrap/Form'
 
 class Dashboard extends Component {
     constructor() {
         super();
         this.state = {
-            displayPods:[]
+            displayPods:[],
+            deploy_button_text: "Create Deployment",
+            showFileUpload: false,
+            showDeployModal: false
         }
     }
     componentDidMount(){
@@ -20,6 +26,7 @@ class Dashboard extends Component {
         if(!!this.props.pods && !!this.props.current_project) {
             const displayPods = this.props.pods.pods.map((pod)=>{
                 if(pod.project_id === this.props.current_project.project_id) {
+                    this.setState({deploy_button_text: "Edit Deployment"})
                     return <React.Fragment>
                     <tr>
                         <td>{pod.pod_id}</td>
@@ -38,6 +45,27 @@ class Dashboard extends Component {
             })
         }
     }
+
+    fileUpload = ()=>{
+        this.setState({showFileUpload: true})
+        this.setState({showDeployModal: false})
+    }
+
+    deploymentModal = ()=>{
+        this.setState({showFileUpload: false})
+        this.setState({showDeployModal: true})
+    }
+
+    handleModalClose = ()=>{
+        this.setState({showFileUpload: false})
+        this.setState({showDeployModal: false})
+    }
+
+    deploy = ()=>{
+        console.log("Deploy")
+        this.handleModalClose()
+    }
+
     render() {
         return (
             <Container fluid ="lg">
@@ -58,6 +86,57 @@ class Dashboard extends Component {
                         {this.state.displayPods}
                     </tbody>
                 </Table>
+                <br/>
+                <Button variant="primary" size="lg" block onClick={this.fileUpload}>{this.state.deploy_button_text}</Button>
+                
+                <Modal
+                    show={this.state.showFileUpload}
+                    onHide={this.state.handleModalClose}
+                    backdrop="static"
+                    keyboard={false}
+                >
+                    <Modal.Header>
+                    <Modal.Title>Upload Tensorflow Model and Inference Files</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="mb-3">
+                            <Form.File id="tf-file-upload" custom>
+                            {/* <Form.File.Input isValid /> */}
+                            <Form.File.Label data-browse="Browse">
+                                Upload TensorFlow Model
+                            </Form.File.Label>
+                            <Form.Control.Feedback type="valid">Upload Sucessful!</Form.Control.Feedback>
+                            </Form.File>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={this.handleModalClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={this.deploymentModal}>Proceed</Button>
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal
+                    show={this.state.showDeployModal}
+                    onHide={this.state.handleModalClose}
+                    backdrop="static"
+                    keyboard={false}
+                >
+                    <Modal.Header>
+                    <Modal.Title>Configure and Deploy Application</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                    Form to be created here
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <Button variant="secondary" onClick={this.handleModalClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={this.deploy}>Deploy</Button>
+                    </Modal.Footer>
+                </Modal>
+
             </Container>
         )
     }
@@ -82,4 +161,3 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(Dashboard);
-
