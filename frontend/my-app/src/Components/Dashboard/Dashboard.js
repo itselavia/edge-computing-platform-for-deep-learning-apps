@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import Form from 'react-bootstrap/Form'
+import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
 
 class Dashboard extends Component {
     constructor() {
@@ -99,15 +99,23 @@ class Dashboard extends Component {
                     <Modal.Title>Upload Tensorflow Model and Inference Files</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="mb-3">
-                            <Form.File id="tf-file-upload" custom>
-                            {/* <Form.File.Input isValid /> */}
-                            <Form.File.Label data-browse="Browse">
-                                Upload TensorFlow Model
-                            </Form.File.Label>
-                            <Form.Control.Feedback type="valid">Upload Sucessful!</Form.Control.Feedback>
-                            </Form.File>
+                    <Form>
+                        <div>
+                        <Form.File 
+                            id="custom-file"
+                            label="Upload Tensorflow Model"
+                            custom
+                        />
                         </div>
+                        <br/>
+                        <div>
+                        <Form.File 
+                            id="custom-file"
+                            label="Upload Inference file"
+                            custom
+                        />
+                        </div>
+                        </Form>
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={this.handleModalClose}>
@@ -121,13 +129,166 @@ class Dashboard extends Component {
                     show={this.state.showDeployModal}
                     onHide={this.state.handleModalClose}
                     backdrop="static"
+                    size="lg"
                     keyboard={false}
                 >
                     <Modal.Header>
                     <Modal.Title>Configure and Deploy Application</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                    Form to be created here
+                        <Form>
+                            <fieldset>
+                                <Form.Row>
+                                    <Col sm="3">
+                                        <Form.Label>
+                                        <b>Image Name</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col sm="4">
+                                        <Form.Check
+                                        type="radio"
+                                        label="Default Platform Image"
+                                        name="imageNameRadios"
+                                        id="imageNameRadios1"
+                                        />
+                                    </Col>
+                                    <Col sm="4">
+                                        <Form.Check
+                                        type="radio"
+                                        label="Custom Docker Image"
+                                        name="imageNameRadios"
+                                        id="imageNameRadios2"
+                                        />
+                                    </Col>
+                                </Form.Row>
+                                <Form.Row>
+                                    <Col sm="3"></Col>
+                                    <Col sm="8">
+                                        <Form.Control placeholder="Image Path" />
+                                    </Col>
+                                </Form.Row>
+                            </fieldset>
+                            <br/>
+                            <Form.Row>
+                                    <Col sm="2">
+                                        <Form.Label>
+                                        <b>Total Memory</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="9">
+                                        <Form.Control placeholder="In MegaBytes" />
+                                    </Col>
+                            </Form.Row>
+                            <br/>
+                            <Form.Row>
+                                    <Col sm="2">
+                                        <Form.Label>
+                                        <b>CPU Units</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="9">
+                                        <Form.Control placeholder="Resuest Units" />
+                                    </Col>
+                            </Form.Row>
+                            <br/>
+                            <Form.Row>
+                                    <Col sm="3">
+                                        <Form.Label>
+                                        <b>Label Key</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col sm="3">
+                                        <Form.Control/>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="2">
+                                        <Form.Label>
+                                        <b>Label Value</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="3">
+                                        <Form.Control/>
+                                    </Col>
+                            </Form.Row>
+                            <br/>
+                            <fieldset>
+                                <Form.Row>
+                                    <Col sm="3">
+                                        <Form.Label>
+                                        <b>Pod Types</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col sm="4">
+                                        <Form.Check
+                                        type="checkbox"
+                                        label="GPU Support"
+                                        name="podTypeCheckbox"
+                                        id="podTypeCheckbox1"
+                                        />
+                                    </Col>
+                                    <Col sm="4">
+                                        <Form.Check
+                                        type="checkbox"
+                                        label="CPU only"
+                                        name="podTypeCheckbox"
+                                        id="podTypeCheckbox2"
+                                        />
+                                    </Col>
+                                </Form.Row>
+                            </fieldset>
+                            <br/>
+                            <fieldset>
+                                <Form.Row>
+                                    <Col sm="3">
+                                        <Form.Label>
+                                        <b>Node Selection</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col sm="3">
+                                        <Form.Check
+                                        type="radio"
+                                        label="Default Node Selection"
+                                        name="nodeSelectionRadios"
+                                        id="nodeSelectionRadios1"
+                                        />
+                                    </Col>
+                                    <Col sm="3">
+                                        <Form.Check
+                                        type="radio"
+                                        label="Custom Node Selection"
+                                        name="nodeSelectionRadios"
+                                        id="nodeSelectionRadios2"
+                                        />
+                                    </Col>
+                                    <Col>
+                                    <DropdownButton id="dropdown-basic-button" title="Select">
+                                        <Dropdown.Item href="#/action-1"><Form.Check
+                                        type="checkbox"
+                                        label="Pod 1"
+                                        name="podSelectCheckbox"
+                                        id="podSelectCheckbox1"
+                                        /></Dropdown.Item>
+                                        <Dropdown.Item href="#/action-2"><Form.Check
+                                        type="checkbox"
+                                        label="Pod 2"
+                                        name="podSelectCheckbox"
+                                        id="podSelectCheckbox2"
+                                        /></Dropdown.Item>
+                                        <Dropdown.Item href="#/action-3"><Form.Check
+                                        type="checkbox"
+                                        label="Pod 3"
+                                        name="podSelectCheckbox"
+                                        id="podSelectCheckbox3"
+                                        /></Dropdown.Item>
+                                    </DropdownButton>
+                                    </Col>
+                                </Form.Row>
+                                <br/>
+                            </fieldset>
+                            </Form>
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="secondary" onClick={this.handleModalClose}>
