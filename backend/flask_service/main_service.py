@@ -1,7 +1,10 @@
 from flask import Flask, request
 from flask_mysqldb import MySQL
+import jwt
 import hashlib
+import datetime
 from flask import jsonify, json
+
 
 app = Flask(__name__)
 
@@ -39,17 +42,24 @@ def newUser():
         return "User Already Exists", 409
 
 
-# @app.route("/login")
-# def login():
-#     reqData = request.json
-#     email = reqData['email']
-#     cur = mysql.connection.cursor()
+@app.route("/login")
+def login():
+    print("i am in loginnnnn")
+    user_email = request.args.get('email')
+    cur = mysql.connection.cursor()
+    
+     # Checking if the user exists
+    userExists = cur.execute("SELECT name FROM user WHERE email_id=%s",
+                              (user_email, ))
+    if (userExists == 0):
+        return "User Doesn't Exist", 401
 
-#     # Checking if the user exists
-#     userExists = cur.execute("SELECT name FROM user WHERE email_id=%s",
-#                              (user_email, ))
-#     if (userExists == 0):
-#         return "User Doesn't Exist", 401
+    else:
+        token = jwt.encode({'email': user_email}, 'secret', algorithm='HS256')
+        return jsonify({'token': token}), 201
+        #  <add code to tokenify email>
+        
+
 
 
 @app.route("/newProject", methods=['POST'])
@@ -89,7 +99,7 @@ def newProject():
 @app.route("/projects")
 def listProjects():
     reqData = request.json
-    user_email = reqData['user_email']
+    user_email = request.args.get('email')
     cur = mysql.connection.cursor()
 
     num_projects = cur.execute(
@@ -103,15 +113,21 @@ def listProjects():
     for project in cur.fetchall():
         project_IDs.append(project['project_id'])
 
-    sql = 'SELECT project_name, project_id FROM projects WHERE project_id IN (%s)'
+    sql = 'SELECT project_name, project_id, project_desc FROM projects WHERE project_id IN (%s)'
     in_p = ', '.join(list(map(lambda x: '%s', project_IDs)))
     sql = sql % in_p
     cur.execute(sql, project_IDs)
-    project_list = {}
+    project_list = []
+    
     for row in cur.fetchall():
-        project_list[row['project_name']] = row['project_id']
-
+        temp = {}
+        temp["project_id"] = row['project_id']
+        temp["project_name"] = row['project_name']
+        temp["project_desc"] = row['project_desc']
+        project_list.append(temp)
+    print("project list :" + str(project_list))
     return json.dumps(project_list), 200
+
 
 
 @app.route("/addProjectUser", methods=['POST'])
