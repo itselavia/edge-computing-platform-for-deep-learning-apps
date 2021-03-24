@@ -41,10 +41,10 @@ def newUser():
         return "User Already Exists", 409
 
 
-@app.route("/login")
+@app.route("/login", methods=['POST'])
 def login():
-    print("i am in loginnnnn")
-    user_email = request.args.get('email')
+    reqData = request.json
+    user_email = reqData['email']
     cur = mysql.connection.cursor()
 
     # Checking if the user exists
