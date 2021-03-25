@@ -9,7 +9,6 @@ verify_ssl = true
 flask = "*"
 flask-mysqldb = "*"
 pyjwt = "*"
-flask-cors = "*"
 
 [requires]
 python_version = "3.8"

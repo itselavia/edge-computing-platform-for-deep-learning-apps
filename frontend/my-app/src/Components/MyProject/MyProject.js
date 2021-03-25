@@ -5,7 +5,9 @@ import { getUserProjectsAndPods, changeCurrentProject } from "../../redux/action
 import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
 import DonutChart from 'react-donut-chart';
-import { Col, Row ,Nav} from 'react-bootstrap';
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import { Col, Row ,Nav, Form} from 'react-bootstrap';
 
 class MyProject extends Component {
     
@@ -14,7 +16,8 @@ class MyProject extends Component {
         this.state = {
             email:props.auth.user.email,
             projects:[],
-            pods:[]
+            pods:[],
+            showCreateProject: false
         }
     }
     componentDidMount() {
@@ -102,10 +105,26 @@ class MyProject extends Component {
         }
         })
     }
+
+    createProjectModal = ()=>{
+        this.setState({showCreateProject: true})
+    }
+
+    handleModalClose = ()=>{
+        this.setState({showCreateProject: false})
+    }
+
+    createProject = ()=>{
+        console.log("Creating Project");
+        this.setState({showCreateProject: false})
+    }
+
     render() {
         return (
           
             <Container fluid ="lg">
+                <br/>
+                <h1>Resource Summary</h1>
                 <br/>
                 <Table striped bordered hover responsive >
                     <thead>
@@ -123,9 +142,14 @@ class MyProject extends Component {
                         {this.state.displayPods}
                     </tbody>
                 </Table>
-                <br></br>
-                
+                <br/>
+                <Button variant="primary" size="lg" block onClick={this.createProjectModal}>Create New Project</Button>
+                <br/>
+
                    <Container>
+                       <br/>
+                       <h1>Project Summary</h1>
+                       <br/>
                        <Row xs={1} md={2}>
                            <Col >
                             <Table striped bordered hover responsive variant="dark">
@@ -133,6 +157,7 @@ class MyProject extends Component {
                                     <tr>
                                         <th>Project Id</th>
                                         <th>Project Name</th>
+                                        <th>Project Description</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,12 +173,54 @@ class MyProject extends Component {
                        </Row>
                     </Container>
             
+                <Modal
+                show={this.state.showCreateProject}
+                onHide={this.state.handleModalClose}
+                backdrop="static"
+                size="lg"
+                keyboard={false}
+                >
+                <Modal.Header>
+                <Modal.Title>Create New Project</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                            <Form.Row>
+                                    <Col sm="2">
+                                        <Form.Label>
+                                        <b>Project Name</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="9">
+                                        <Form.Control/>
+                                    </Col>
+                            </Form.Row>
+                            <br/>
+                            <Form.Row>
+                                    <Col sm="2">
+                                        <Form.Label>
+                                        <b>Project Description</b>
+                                        </Form.Label>
+                                    </Col>
+                                    <Col></Col>
+                                    <Col sm="9">
+                                        <Form.Control/>
+                                    </Col>
+                            </Form.Row>
+                    </Form>
+                    </Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleModalClose}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={this.createProject}>Create</Button>
+                </Modal.Footer>
+                </Modal>
+
             </Container>
-         
         )
     }
-
-    
 }
 
 MyProject.propTypes = {

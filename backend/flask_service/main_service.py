@@ -1,13 +1,11 @@
 from flask import Flask, request
 from flask_mysqldb import MySQL
 import jwt
-from flask_cors import CORS
 import hashlib
 import datetime
 from flask import jsonify, json
 
 app = Flask(__name__)
-CORS(app)
 
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
