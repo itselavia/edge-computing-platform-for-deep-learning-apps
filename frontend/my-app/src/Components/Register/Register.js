@@ -70,7 +70,7 @@ class Register extends Component {
 
     const userData = {
       email: this.state.email,
-      name: this.state.screen_name,
+      name: this.state.name,
       phone: this.state.phone
     };
 

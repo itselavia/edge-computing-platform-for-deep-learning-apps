@@ -36,6 +36,7 @@ def after_request(response):
 @app.route("/newUser", methods=['POST'])
 def newUser():
     reqData = request.json
+    print(reqData)
     name = reqData['name']
     email = reqData['email']
     phone = reqData['phone']
@@ -63,10 +64,13 @@ def login():
     userExists = cur.execute("SELECT name FROM user WHERE email_id=%s",
                              (user_email, ))
     if (userExists == 0):
-        return "User Doesn't Exist", 401
+        
+        #return "User Doesn't Exist", 401
+        token = jwt.encode({'userExists': False,'email': user_email}, 'top-secret-phrase')
+        return jsonify({'token': token}), 201
 
     else:
-        token = jwt.encode({'email': user_email}, 'secret', algorithm='HS256')
+        token = jwt.encode({userExists: True,'email': user_email}, 'top-secret-phrase')
         return jsonify({'token': token}), 201
 
 
@@ -242,3 +246,6 @@ def convertModel(id):
 @app.route("/project/<id>/deployModel", methods=['POST'])
 def deployModel(id):
     return "deployModel", 201
+    
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=5000)

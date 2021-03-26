@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { getUserProjectsAndPods, changeCurrentProject } from "../../redux/actions/authActions";
+import { getUserProjectsAndPods, changeCurrentProject, createProjectAction } from "../../redux/actions/authActions";
 import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
 import DonutChart from 'react-donut-chart';
@@ -48,6 +48,7 @@ class MyProject extends Component {
                 <tr>
                      <td onClick={()=>this.onProjectClick(proj.project_id)}>{proj.project_id}</td>
                      <td>{proj.project_name}</td>
+                     <td>{proj.project_desc}</td>
                 </tr>
                 
             </React.Fragment>
@@ -114,8 +115,20 @@ class MyProject extends Component {
         this.setState({showCreateProject: false})
     }
 
+    onChange = e => {
+        this.setState({
+          [e.target.id]: e.target.value
+        });
+    };
+
     createProject = ()=>{
         console.log("Creating Project");
+        const data = {
+            project_name:this.state.project_name,
+            project_desc:this.state.project_desc,
+            user_email:this.state.email
+        }
+        this.props.createProjectAction(data);
         this.setState({showCreateProject: false})
     }
 
@@ -186,27 +199,34 @@ class MyProject extends Component {
                 <Modal.Body>
                     <Form>
                             <Form.Row>
-                                    <Col sm="2">
-                                        <Form.Label>
-                                        <b>Project Name</b>
-                                        </Form.Label>
-                                    </Col>
-                                    <Col></Col>
-                                    <Col sm="9">
-                                        <Form.Control/>
-                                    </Col>
+                                <Form.Group as={Col} controlId="project_name">
+                                            <Form.Label>
+                                            <b>Project Name</b>
+                                            </Form.Label>
+                                            
+                                        
+                                        <Form.Control name="project_name"
+                                                type="text"
+                                                onChange={this.onChange}
+                                                placeholder="Enter a Project name"
+                                                
+                                            required />
+                                </Form.Group>     
                             </Form.Row>
                             <br/>
                             <Form.Row>
-                                    <Col sm="2">
-                                        <Form.Label>
-                                        <b>Project Description</b>
-                                        </Form.Label>
-                                    </Col>
-                                    <Col></Col>
-                                    <Col sm="9">
-                                        <Form.Control/>
-                                    </Col>
+                                <Form.Group as={Col} controlId="project_desc">
+                                            <Form.Label>
+                                            <b>Project Description</b>
+                                            </Form.Label>
+                                    
+                                        <Form.Control name="project_desc"
+                                                type="text"
+                                                onChange={this.onChange}
+                                                placeholder="Enter Project Desc"
+                                                
+                                            required />
+                                </Form.Group>  
                             </Form.Row>
                     </Form>
                     </Modal.Body>
@@ -226,6 +246,7 @@ class MyProject extends Component {
 MyProject.propTypes = {
     getUserProjectsAndPods: PropTypes.func.isRequired,
     changeCurrentProject: PropTypes.func.isRequired,
+    createProjectAction: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     pods: PropTypes.object.isRequired,
     projects: PropTypes.object.isRequired,
@@ -242,4 +263,4 @@ const mapStateToProps = state => ({
     success: state.success
 });
 
-export default connect(mapStateToProps, { getUserProjectsAndPods, changeCurrentProject })(MyProject);
+export default connect(mapStateToProps, { getUserProjectsAndPods, changeCurrentProject, createProjectAction })(MyProject);

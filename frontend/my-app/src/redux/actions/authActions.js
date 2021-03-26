@@ -23,16 +23,16 @@ export const loginUser = userData => dispatch => {
   dispatch({
     type: RESET_ALL_STATE
   });
-  axios.post("http://localhost:3000/login", userData)
+  axios.post("http://localhost:5000/login", userData)
     .then(res => {
       console.log("userdata ---------------------"+userData)
       console.log(userData)
-       console.log(res)
-      if (res.data.length > 0) {
+       console.log(res.data)
+      if (res.data.token.length > 0) {
           console.log("in action of login")
          // console.log(res.data)
         // Set token to localStorage
-        const token = res.data;
+        const token = res.data.token;
        localStorage.setItem("jwtToken", token);
         // Set token to Auth header
        setAuthToken(token);
@@ -59,7 +59,7 @@ export const registerUser = userData => dispatch => {
   dispatch({
     type: RESET_ALL_STATE
   });
-  axios.post("http://localhost:3000/newUser", userData)
+  axios.post("http://localhost:5000/newUser", userData)
     .then(res => {
       console.log(res);
       userData = {userExists:true, email:userData.email, phone:userData.phone, name:userData.name}
@@ -106,8 +106,8 @@ export const registerUser = userData => dispatch => {
 //     });
 // };
 export const getUserProjectsAndPods = userData => dispatch => {
-  const projReq = axios.get("http://localhost:3000/projects", {params: {email:userData.email}});
-  const podsReq = axios.get("http://127.0.0.1:3000/allPods", {params: {email:userData.email}});
+  const projReq = axios.get("http://localhost:5000/projects", {params: {email:userData.email}});
+  const podsReq = axios.get("http://localhost:3000/allPods", {params: {email:userData.email}});
 
   axios.all([projReq, podsReq]).then(axios.spread((...response) => {
     const res1 = response[0];
@@ -122,6 +122,31 @@ export const getUserProjectsAndPods = userData => dispatch => {
 
   })
 }
+
+export const createProjectAction = projData => dispatch =>{
+  axios.post("http://localhost:5000/newProject", projData)
+    .then(res => {
+      
+       console.log(res.data)
+      // if (res.data.token.length > 0) {
+      //     console.log("in action of login")
+      //    // console.log(res.data)
+      //   // Set token to localStorage
+      //   const token = res.data.token;
+      //  localStorage.setItem("jwtToken", token);
+      //   // Set token to Auth header
+      //  setAuthToken(token);
+      //   // Decode token to get user data
+      //   const decoded = jwt_decode(token);
+      //   // Set current user
+      //   // const decoded = {userExists:false, email: "aish@gmail.com"}
+      //   console.log(token)
+      //   dispatch(setCurrentUser(decoded));
+      // }
+
+    })
+}
+
 
 export const changeCurrentProject = projData => dispatch =>{
   dispatch(changeCurrentProjState(projData));
