@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	appsv1 "k8s.io/api/apps/v1"
@@ -35,9 +36,57 @@ type NewUserInput struct {
 	UserName string `json:"user_name"`
 }
 
+// PodInfo holds the strcuture for information about pods. output json for /getAllPods
+type PodInfo struct {
+	PodName     string    `json:"pod_name"`
+	ProjectName string    `json:"project_name"`
+	NodeName    string    `json:"node_name"`
+	Status      string    `json:"status"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
 //IndexHandler for / path
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Alive\n"))
+}
+
+//GetAllPodsHandler for /getAllPods path. It returns the list of all pods in the user's namespace
+func GetAllPodsHandler(w http.ResponseWriter, r *http.Request) {
+
+	clientset, err := getKubeClientSet()
+	if err != nil {
+		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
+	}
+
+	userNamespace := "default"
+	pods, err := clientset.CoreV1().Pods(userNamespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to fetch pod list from " + userNamespace + " namespace: " + err.Error() + "\n"))
+	}
+
+	var result []PodInfo
+
+	for _, pod := range pods.Items {
+
+		podInfo := &PodInfo{
+			PodName:     pod.Name,
+			NodeName:    pod.Spec.NodeName,
+			Status:      string(pod.Status.Phase),
+			ProjectName: pod.Labels["project"],
+			CreatedAt:   pod.CreationTimestamp.Time,
+		}
+
+		result = append(result, *podInfo)
+
+	}
+
+	podsInfoJSON, err := json.Marshal(result)
+	if err != nil {
+		w.Write([]byte("Unable to convert pods info to JSON: " + err.Error() + "\n"))
+	}
+
+	w.Write([]byte(string(podsInfoJSON)))
+
 }
 
 // ConvertModelHandler invokes the Cloud Function to convert the TensorFlow model to TFLite model
@@ -70,7 +119,7 @@ func ConvertModelHandler(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post(invokerURL, "application/json", responseBody)
 
 	if err != nil {
-		w.Write([]byte("Unable to send POST request to Cloud Functions" + err.Error() + "\n"))
+		w.Write([]byte("Unable to send POST request to Cloud Functions: " + err.Error() + "\n"))
 	}
 
 	defer resp.Body.Close()
@@ -78,7 +127,7 @@ func ConvertModelHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		w.Write([]byte("Unable to read response body from Cloud Functions" + err.Error() + "\n"))
+		w.Write([]byte("Unable to read response body from Cloud Functions: " + err.Error() + "\n"))
 	}
 
 	w.Write([]byte(string(response)))
@@ -93,12 +142,12 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&input)
 
 	if err != nil {
-		w.Write([]byte("JSON Input incorrect" + err.Error() + "\n"))
+		w.Write([]byte("JSON Input incorrect: " + err.Error() + "\n"))
 	}
 
 	clientset, err := getKubeClientSet()
 	if err != nil {
-		w.Write([]byte("Unable to create clienset for Kubernetes" + err.Error() + "\n"))
+		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
 	}
 
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
@@ -162,12 +211,12 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&input)
 
 	if err != nil {
-		w.Write([]byte("JSON Input incorrect" + err.Error() + "\n"))
+		w.Write([]byte("JSON Input incorrect: " + err.Error() + "\n"))
 	}
 
 	clientset, err := getKubeClientSet()
 	if err != nil {
-		w.Write([]byte("Unable to create clienset for Kubernetes" + err.Error() + "\n"))
+		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
 	}
 
 	namespacesClient := clientset.CoreV1().Namespaces()
@@ -189,11 +238,12 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getKubeClientSet() (*kubernetes.Clientset, error) {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
+
+	config, err := getClusterConfig()
 	if err != nil {
 		return nil, err
 	}
+
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -202,6 +252,15 @@ func getKubeClientSet() (*kubernetes.Clientset, error) {
 	}
 
 	return clientset, nil
+}
+
+func getClusterConfig() (*rest.Config, error) {
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
 }
 
 func int32Ptr(i int32) *int32 { return &i }
@@ -213,6 +272,7 @@ func main() {
 	r.HandleFunc("/convertModel", ConvertModelHandler).Methods("POST")
 	r.HandleFunc("/deployModel", DeployModelHandler).Methods("POST")
 	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST")
+	r.HandleFunc("/getAllPods", GetAllPodsHandler).Methods("GET")
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8000", r))

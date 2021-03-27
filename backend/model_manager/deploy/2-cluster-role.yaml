@@ -3,6 +3,6 @@ kind: ClusterRole
 metadata:
   name: deployment-admin-clusterrole
 rules:
-- apiGroups: ["apps"]
-  resources: ["deployments"]
+- apiGroups: [""]
+  resources: ["deployments", "pods"]
   verbs: ["get", "list", "create", "delete"]
