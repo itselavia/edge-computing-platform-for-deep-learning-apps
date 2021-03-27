@@ -8,14 +8,11 @@ import { Card, Col, Container, Badge, Row } from 'react-bootstrap'
 class Home extends Component {
     componentDidMount() {
         if (!this.props.auth.isAuthenticated) {
-           // if (this.props.auth.user.email_verified) {
+          
                 this.props.history.push("/login");
-            //}
+          
         }
-        // else {
-        //     this.props.history.push("/login");
-        //     console.log("not auth")
-        // }
+        
     }
     render() {
         return (

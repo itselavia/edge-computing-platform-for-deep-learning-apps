@@ -29,7 +29,7 @@ class _Navbar extends Component {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
                         <Nav.Link href="/">Home</Nav.Link>
-                        <Nav.Link href="/devices">Train Model</Nav.Link>
+                        <Nav.Link href="/projects">My Projects</Nav.Link>
                         <Nav.Link href="/cluster">Cluster</Nav.Link>
                         <NavDropdown title="Devices" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/addDevice">Add a device</NavDropdown.Item>
