@@ -33,7 +33,7 @@ type DeployModelInput struct {
 
 // NewUserInput holds the structure for input to /createUser
 type NewUserInput struct {
-	UserName string `json:"user_name"`
+	Email string `json:"email"`
 }
 
 // PodInfo holds the strcuture for information about pods. output json for /getAllPods
@@ -221,16 +221,18 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	namespacesClient := clientset.CoreV1().Namespaces()
 
+	userNamespace := strings.Replace(input.Email, ".", "-", -1)[:strings.Index(input.Email, "%")]
+
 	namespace := &apiv1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: input.UserName,
+			Name: userNamespace,
 		},
 	}
 
 	result, err := namespacesClient.Create(context.TODO(), namespace, metav1.CreateOptions{})
 
 	if err != nil {
-		w.Write([]byte("Unable to create Namespace for the user: " + input.UserName + " :" + err.Error() + "\n"))
+		w.Write([]byte("Unable to create Namespace for the user: " + input.Email + " : " + err.Error() + "\n"))
 	}
 
 	w.Write([]byte("Created Namespace successfully: " + result.GetObjectMeta().GetName() + "\n"))

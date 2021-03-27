@@ -4,5 +4,5 @@ metadata:
   name: deployment-admin-clusterrole
 rules:
 - apiGroups: [""]
-  resources: ["deployments", "pods"]
+  resources: ["deployments", "pods", "namespaces"]
   verbs: ["get", "list", "create", "delete"]
