@@ -21,7 +21,8 @@ import (
 
 // TFModelFolderInput holds the structure for input to /convertModel
 type TFModelFolderInput struct {
-	FolderName string `json:"saved_model_dir_gcs"`
+	FolderName  string `json:"model_folder_name"`
+	ProjectName string `json:"project_name"`
 }
 
 // DeployModelInput holds the structure for input to /deployModel
@@ -92,6 +93,14 @@ func GetAllPodsHandler(w http.ResponseWriter, r *http.Request) {
 // ConvertModelHandler invokes the Cloud Function to convert the TensorFlow model to TFLite model
 func ConvertModelHandler(w http.ResponseWriter, r *http.Request) {
 
+	keys, ok := r.URL.Query()["email"]
+
+	if !ok || len(keys[0]) < 1 {
+		w.Write([]byte("Url Param 'email' is missing" + "\n"))
+	}
+
+	email := string(keys[0])
+
 	decoder := json.NewDecoder(r.Body)
 
 	var input TFModelFolderInput
@@ -113,6 +122,8 @@ func ConvertModelHandler(w http.ResponseWriter, r *http.Request) {
 	// Payload
 	postBody, _ := json.Marshal(map[string]string{
 		"saved_model_dir_gcs": input.FolderName,
+		"project_name":        input.ProjectName,
+		"email":               email,
 	})
 	responseBody := bytes.NewBuffer(postBody)
 
@@ -205,14 +216,13 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 //CreateUserHandler for /createUser path. It creates namespaces and service accounts for new users
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
-	decoder := json.NewDecoder(r.Body)
+	keys, ok := r.URL.Query()["email"]
 
-	var input NewUserInput
-	err := decoder.Decode(&input)
-
-	if err != nil {
-		w.Write([]byte("JSON Input incorrect: " + err.Error() + "\n"))
+	if !ok || len(keys[0]) < 1 {
+		w.Write([]byte("Url Param 'email' is missing" + "\n"))
 	}
+
+	email := string(keys[0])
 
 	clientset, err := getKubeClientSet()
 	if err != nil {
@@ -221,7 +231,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	namespacesClient := clientset.CoreV1().Namespaces()
 
-	userNamespace := strings.Replace(input.Email, ".", "-", -1)[:strings.Index(input.Email, "%")]
+	userNamespace := strings.Replace(email, ".", "-", -1)[:strings.Index(email, "@")]
 
 	namespace := &apiv1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -232,7 +242,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := namespacesClient.Create(context.TODO(), namespace, metav1.CreateOptions{})
 
 	if err != nil {
-		w.Write([]byte("Unable to create Namespace for the user: " + input.Email + " : " + err.Error() + "\n"))
+		w.Write([]byte("Unable to create Namespace for the user: " + email + " : " + err.Error() + "\n"))
 	}
 
 	w.Write([]byte("Created Namespace successfully: " + result.GetObjectMeta().GetName() + "\n"))

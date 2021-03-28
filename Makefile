@@ -23,9 +23,14 @@ deploy-services: cluster-deploy
 	$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
 	$(eval PROJECT_ID := $(shell terraform -chdir=infra/terraform output project_id))
 	$(eval FUNCTION_NAME := $(shell terraform -chdir=infra/terraform output function_name))
-	$(eval TFLITE_BUCKET := $(shell terraform -chdir=infra/terraform output tflite_bucket))
-	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=infra/terraform/modules/kubernetes/config --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
-	kubectl apply -f backend/model_manager/deploy --kubeconfig=infra/terraform/modules/kubernetes/config
+	$(eval TFLITE_BUCKET := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
+	$(eval KUBECONFIG := infra/terraform/modules/kubernetes/config)
+	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep worker | awk '{print $$1}' | while read line ; do \
+            kubectl label node $$line type=worker --kubeconfig=${KUBECONFIG} --overwrite; \
+        	done;
+
+	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
+	kubectl apply -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}
 
 delete-services:
 	kubectl delete -f backend/model_manager/deploy --kubeconfig=infra/terraform/modules/kubernetes/config

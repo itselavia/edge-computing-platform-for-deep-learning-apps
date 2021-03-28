@@ -3,11 +3,6 @@ resource "google_storage_bucket" "tf_saved_models_bucket" {
   force_destroy = true
 }
 
-resource "google_storage_bucket" "tflite_models_bucket" {
-  name          = "${var.project_name}-tflite-models"
-  force_destroy = true
-}
-
 data "archive_file" "converter_function_zip" {
   type        = "zip"
   source_dir  = "${path.module}/function_code"
@@ -40,7 +35,6 @@ resource "google_cloudfunctions_function" "converter_function" {
 
   environment_variables = {
     SOURCE_BUCKET      = google_storage_bucket.tf_saved_models_bucket.name
-    DESTINATION_BUCKET = google_storage_bucket.tflite_models_bucket.name
   }
 
   timeouts {
