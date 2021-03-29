@@ -17,3 +17,7 @@ output "function_name" {
 output "database_ip" {
   value = module.database.database_ip
 }
+
+output "credentials_location" {
+  value = var.credentials_file_location
+}

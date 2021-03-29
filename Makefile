@@ -9,15 +9,14 @@ cluster-deploy: cluster-init
 
 cluster-destroy: delete-services
 	terraform -chdir=infra/terraform destroy --auto-approve
-	rm -f backend/model_manager/deploy/configmap.yaml
 
 test-converter-function:
 	$(eval BUCKET_URL := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
-	gsutil cp -r example/tf_model/sample_tf_model ${BUCKET_URL}
+	gsutil cp -r example/tf_model/sample_tf_model ${BUCKET_URL}/akshay.elavia@gmail.com/Sample_Project/
 
 test-tflite-model-deploy:
-	$(eval TFLITE_BUCKET := $(shell terraform -chdir=infra/terraform output tflite_bucket))
-	gsutil cp -r example/inference.py ${TFLITE_BUCKET}/sample_tf_model
+	$(eval BUCKET_URL := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
+	gsutil cp example/inference.py ${BUCKET_URL}/akshay.elavia@gmail.com/Sample_Project/
 
 deploy-services: cluster-deploy
 	$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
@@ -25,12 +24,20 @@ deploy-services: cluster-deploy
 	$(eval FUNCTION_NAME := $(shell terraform -chdir=infra/terraform output function_name))
 	$(eval TFLITE_BUCKET := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
 	$(eval KUBECONFIG := infra/terraform/modules/kubernetes/config)
+	$(eval GCP_CREDENTIALS_FILE := $(shell terraform -chdir=infra/terraform output credentials_location))
 	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep worker | awk '{print $$1}' | while read line ; do \
             kubectl label node $$line type=worker --kubeconfig=${KUBECONFIG} --overwrite; \
         	done;
 
+	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep edge | awk '{print $$1}' | while read line ; do \
+            kubectl label node $$line type=edge --kubeconfig=${KUBECONFIG} --overwrite; \
+        	done;
+
+	kubectl create secret generic cloudsql-oauth-credentials --from-file=creds=${GCP_CREDENTIALS_FILE}
 	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
 	kubectl apply -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}
 
 delete-services:
 	kubectl delete -f backend/model_manager/deploy --kubeconfig=infra/terraform/modules/kubernetes/config
+	rm -f backend/model_manager/deploy/configmap.yaml
+	kubectl delete secret cloudsql-oauth-credentials

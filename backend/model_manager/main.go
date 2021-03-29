@@ -19,6 +19,9 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+// Pair holds key value pairs
+type Pair map[string]string
+
 // TFModelFolderInput holds the structure for input to /convertModel
 type TFModelFolderInput struct {
 	FolderName  string `json:"model_folder_name"`
@@ -28,8 +31,13 @@ type TFModelFolderInput struct {
 // DeployModelInput holds the structure for input to /deployModel
 type DeployModelInput struct {
 	DeploymentName string `json:"deployment_name"`
+	CustomImage    string `json:"custom_image"`
 	NumReplicas    int32  `json:"num_replicas"`
-	FolderName     string `json:"tflite_model_folder_name"`
+	ProjectName    string `json:"project_name"`
+	GPUSupport     bool   `json:"gpu_support"`
+	NodeName       string `json:"node_name"`
+	NodeSelectors  []Pair `json:"node_selectors"`
+	Labels         []Pair `json:"labels"`
 }
 
 // NewUserInput holds the structure for input to /createUser
@@ -147,6 +155,14 @@ func ConvertModelHandler(w http.ResponseWriter, r *http.Request) {
 // DeployModelHandler deploys the model's K8S manifests onto the edge nodes
 func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 
+	keys, ok := r.URL.Query()["email"]
+
+	if !ok || len(keys[0]) < 1 {
+		w.Write([]byte("Url Param 'email' is missing" + "\n"))
+	}
+
+	email := string(keys[0])
+
 	decoder := json.NewDecoder(r.Body)
 
 	var input DeployModelInput
@@ -191,16 +207,44 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 									Value: os.Getenv("TFLITE_BUCKET"),
 								},
 								{
-									Name:  "FOLDER_NAME",
-									Value: input.FolderName,
+									Name:  "USER_NAME",
+									Value: email,
+								},
+								{
+									Name:  "PROJECT_NAME",
+									Value: input.ProjectName,
+								},
+							},
+							VolumeMounts: []apiv1.VolumeMount{
+								{
+									Name:      "cloudsql-oauth-credentials",
+									ReadOnly:  true,
+									MountPath: "/etc/credentials",
+								},
+							},
+							ImagePullPolicy: apiv1.PullAlways,
+						},
+					},
+					NodeSelector: map[string]string{
+						"type": "worker",
+					},
+					DNSPolicy: apiv1.DNSDefault,
+					Volumes: []apiv1.Volume{
+						{
+							Name: "cloudsql-oauth-credentials",
+							VolumeSource: apiv1.VolumeSource{
+								Secret: &apiv1.SecretVolumeSource{
+									SecretName: "cloudsql-oauth-credentials",
+									Items: []apiv1.KeyToPath{
+										{
+											Key:  "creds",
+											Path: "cloudsql-oauth-credentials.json",
+										},
+									},
 								},
 							},
 						},
 					},
-					NodeSelector: map[string]string{
-						"type": "edge",
-					},
-					DNSPolicy: apiv1.DNSDefault,
 				},
 			},
 		},

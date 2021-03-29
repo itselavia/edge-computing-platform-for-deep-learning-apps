@@ -41,6 +41,7 @@ ssh_username              = "akshay"
 8. Run ```make cluster-init``` to initialize the and import the Terraform modules into the working directory
 9. Run ```make cluster-plan``` to view all the infrastructure components Terraform will create in Google Cloud
 10. Run ```make cluster-deploy``` which will start creating the cluster infrastructure on GCP.
+10. Run ```make deploy-services``` to deploy the platform microservices to the Kubernetes cluster
 11. The kubeconfig file for the Kubernetes cluster is downloaded to infra/terraform/modules/kubernetes/config. Run the following command to setup KUBECONFIG
 ```
 export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
@@ -60,5 +61,5 @@ export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
 #### Miscelleanous commands
 - kubectl label node k8s-worker-0 type=worker
 - curl -X POST "https://us-west2-edge-platform-cmpe-295b.cloudfunctions.net/tf-to-tflite-converter-function" -H "Content-Type:application/json" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
-- curl -X POST "http://10.244.1.3:8000/convertModel" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
-- curl -X POST "http://10.244.1.5:8000/deployModel" --data '{"deployment_name":"edge-test-dep", "num_replicas": 1, "tflite_model_folder_name": "sample_tf_model"}'
+- curl -X POST "http://localhost:8000/convertModel?email=akshay.elavia%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" -d '{"model_folder_name": "sample_tf_model",  "project_name": "Sample_Project"}'
+- curl -X POST "http://localhost:8000/deployModel?email=akshay.elavia%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" --data '{"deployment_name":"test-deployment", "num_replicas": 2, "project_name": "Sample_Project"}'
