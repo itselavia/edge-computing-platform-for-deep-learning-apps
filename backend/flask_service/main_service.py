@@ -252,7 +252,7 @@ def uploadModel():
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/"+source_file_name)
     print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))"""
-    return "uploadModel", 201
+    return jsonify("uploadModel successful"), 201
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
 def convertModel(id):
