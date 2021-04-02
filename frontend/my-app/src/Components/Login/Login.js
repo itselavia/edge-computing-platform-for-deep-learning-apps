@@ -41,6 +41,9 @@ class Login extends Component {
         if(props.auth.isAuthenticated && !props.auth.user.userExists) {
             this.props.history.push("/register");
         }
+        else if(props.auth.isAuthenticated && props.auth.user.userExists) {
+            this.props.history.push("/projects");
+        }
         // if (!props.auth.isAuthenticated && !props.errors.userExists) {
         //   //  this.props.history.push("/register");
         // } else if(props.auth.user.id && !props.auth.user.email_verified){

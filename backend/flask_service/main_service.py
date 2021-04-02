@@ -28,7 +28,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods',
-                         'GET,PUT,POST,DELETE,OPTIONS')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
@@ -70,7 +69,6 @@ def login():
         return jsonify({'token': token}), 201
 
     else:
-        token = jwt.encode({userExists: True,'email': user_email}, 'top-secret-phrase')
         return jsonify({'token': token}), 201
 
 
@@ -241,18 +239,22 @@ def getOrDeleteProject():
 @app.route("/project/uploadModel", methods=['POST'])
 def uploadModel():
     """os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    """
     username = request.form["username"]
     projectname = request.form["projectname"]
     source_file_name = request.files["modelfile"].filename
     request.files["modelfile"].save("models/"+source_file_name)
+    """
+    """
     storage_client = storage.Client()
     bucket_name='finalprojectenv-storage'
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname+"/"+source_file_name
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/"+source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))"""
-    return jsonify("uploadModel successful"), 201
+    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    print(request.form)
+    time.sleep(5)
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
 def convertModel(id):

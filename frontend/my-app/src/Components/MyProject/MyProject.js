@@ -29,9 +29,9 @@ class MyProject extends Component {
             this.props.getUserProjectsAndPods(userData); 
         }
     }
-    onProjectClick(proj_id) {
-        console.log(proj_id)
-        const projData = {project_id:proj_id}
+    onProjectClick(proj) {
+        // console.log(proj_id)
+        const projData = proj
         this.props.changeCurrentProject(projData);
         this.props.history.push("/dashboard");
     }
@@ -46,7 +46,7 @@ class MyProject extends Component {
                
             <React.Fragment>
                 <tr>
-                     <td onClick={()=>this.onProjectClick(proj.project_id)}>{proj.project_id}</td>
+                     <td onClick={()=>this.onProjectClick(proj)}>{proj.project_id}</td>
                      <td>{proj.project_name}</td>
                      <td>{proj.project_desc}</td>
                 </tr>

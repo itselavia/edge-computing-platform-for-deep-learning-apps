@@ -6,6 +6,8 @@ import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
+import {uploadFile} from "../../redux/actions/authActions"
+import Loader from "react-loader-spinner";
 
 class Dashboard extends Component {
     constructor() {
@@ -46,12 +48,32 @@ class Dashboard extends Component {
         }
     }
 
+    onChange = e => {
+        this.setState({
+          [e.target.id]: e.target.value
+        });
+      //  console.log(this.state.model_file)
+    };
+
     fileUpload = ()=>{
         this.setState({showFileUpload: true})
         this.setState({showDeployModal: false})
     }
 
     deploymentModal = ()=>{
+       
+        const modelData = {
+            username : this.props.current_project.owner_email,
+            projectname : this.props.current_project.project_name,
+            model_file : this.state.model_file
+        }
+        const inferData = {
+            username : this.props.current_project.owner_email,
+            projectname : this.props.current_project.project_name,
+            inference_file : this.state.inference_file
+        }
+        this.props.uploadFile(modelData, inferData);
+       
         this.setState({showFileUpload: false})
         this.setState({showDeployModal: true})
     }
@@ -67,6 +89,23 @@ class Dashboard extends Component {
     }
 
     render() {
+        if(this.props.auth.loading) 
+            return (
+                <Container fluid ="lg">
+                    <br/>
+                    <Table>
+                        <Loader
+                        type="Puff"
+                        color="#00BFFF"
+                        height={100} 
+                        width={100}
+                        timeout={3000} //3 secs
+                       
+                        />
+                </Table>
+                </Container>
+              );
+        else
         return (
             <Container fluid ="lg">
                 <br/>
@@ -102,17 +141,21 @@ class Dashboard extends Component {
                     <Form>
                         <div>
                         <Form.File 
-                            id="custom-file"
+                            id="model_file"
                             label="Upload Tensorflow Model"
-                            custom
+                            data-browse="Select"
+                            onChange={this.onChange}
+                            
                         />
                         </div>
                         <br/>
                         <div>
                         <Form.File 
-                            id="custom-file"
+                            id="inference_file"
                             label="Upload Inference file"
-                            custom
+                            data-browse="Select"
+                            onChange={this.onChange}
+                            
                         />
                         </div>
                         </Form>
@@ -305,6 +348,7 @@ class Dashboard extends Component {
 
 
 Dashboard.propTypes = {
+    uploadFile: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     pods: PropTypes.object.isRequired,
     projects: PropTypes.object.isRequired,
@@ -321,4 +365,4 @@ const mapStateToProps = state => ({
     success: state.success
 });
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps, { uploadFile })(Dashboard);

@@ -14,7 +14,8 @@ import {
   SET_USER_PODS,
   SET_USER_PROJECTS,
   CURRENT_USER_INFO,
-  SET_CURRENT_PROJECT
+  SET_CURRENT_PROJECT,
+  USER_LOADING_STOP
 } from "./action-types";
 
 // Login - get user token
@@ -147,6 +148,42 @@ export const createProjectAction = projData => dispatch =>{
     })
 }
 
+export const uploadFile = (modelData, inferData) => dispatch =>{
+  console.log(modelData)
+  console.log(inferData)
+  let model_formData = new FormData();
+  let infer_formData = new FormData();
+  model_formData.append('username', modelData.username);
+  model_formData.append('projectname', modelData.projectname)
+  model_formData.append('modelfile', modelData.model_file)
+
+  infer_formData.append('username', inferData.username);
+  infer_formData.append('projectname', inferData.projectname)
+  infer_formData.append('inferencefile', inferData.inference_file)
+
+  // for (var key of model_formData.entries()) {
+  //   console.log(key[0] + ', ' + key[1])
+  // }
+  const headers = {
+    'Content-Type': 'multipart/form-data',
+}
+  const modelReq = axios.post("http://localhost:5000/project/uploadModel", model_formData, headers);
+  // const inferReq = axios.post("http://localhost:5000/allPods", {params: {email:userData.email}});
+  dispatch(setUserLoading())
+  axios.all([modelReq]).then(axios.spread((...response) => {
+    const res1 = response[0];
+    // const res2 = response[1];
+    console.log(res1)
+    dispatch(stopUserLoading())
+    // if(res1.data.length>=0 ) {
+      
+    //   dispatch(setUserProjects(res1.data));
+    //   dispatch(setUserPods(res2.data));
+    // }
+  })).catch(errors => {
+
+  })
+}
 
 export const changeCurrentProject = projData => dispatch =>{
   dispatch(changeCurrentProjState(projData));
@@ -252,6 +289,11 @@ export const setUserLoading = () => {
   };
 };
 
+export const stopUserLoading = () => {
+  return {
+    type: USER_LOADING_STOP
+  };
+};
 // Logout
 export const logoutUser = (history) => dispatch => {
   // Remove token from local storage
