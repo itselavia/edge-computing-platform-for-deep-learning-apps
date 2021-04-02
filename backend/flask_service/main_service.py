@@ -4,6 +4,8 @@ import jwt
 import hashlib
 import datetime
 from flask import jsonify, json
+import os
+import time
 
 app = Flask(__name__)
 
@@ -28,6 +30,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods',
+                         'GET,PUT,POST,DELETE,OPTIONS,HEAD')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
@@ -69,6 +72,7 @@ def login():
         return jsonify({'token': token}), 201
 
     else:
+        token = jwt.encode({'userExists': True,'email': user_email}, 'top-secret-phrase')
         return jsonify({'token': token}), 201
 
 
@@ -238,8 +242,9 @@ def getOrDeleteProject():
     
 @app.route("/project/uploadModel", methods=['POST'])
 def uploadModel():
-    """os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
     """
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    
     username = request.form["username"]
     projectname = request.form["projectname"]
     source_file_name = request.files["modelfile"].filename
@@ -253,8 +258,10 @@ def uploadModel():
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/"+source_file_name)
     print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    """
     print(request.form)
     time.sleep(5)
+    return "uploadModel", 201
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
 def convertModel(id):
