@@ -100,7 +100,10 @@ class Dashboard extends Component {
                         height={100} 
                         width={100}
                         timeout={3000} //3 secs
-                       
+                        style={{
+                            position: 'absolute', left: '50%', top: '50%',
+                            transform: 'translate(-50%, -50%)'
+                        }}
                         />
                 </Table>
                 </Container>
