@@ -240,7 +240,7 @@ def getOrDeleteProject():
     
 @app.route("/project/uploadModel", methods=['POST'])
 def uploadModel():
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    """os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
     username = request.form["username"]
     projectname = request.form["projectname"]
     source_file_name = request.files["modelfile"].filename
@@ -251,7 +251,7 @@ def uploadModel():
     destination_blob_name = projectname+"/"+source_file_name
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/"+source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))"""
     return "uploadModel", 201
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
