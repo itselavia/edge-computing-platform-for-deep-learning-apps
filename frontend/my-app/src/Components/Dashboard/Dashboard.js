@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal'
 import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
 import {uploadFile} from "../../redux/actions/authActions"
 import Loader from "react-loader-spinner";
+import AddUser from './AddUser';
 
 class Dashboard extends Component {
     constructor() {
@@ -82,7 +83,14 @@ class Dashboard extends Component {
         this.setState({showFileUpload: false})
         this.setState({showDeployModal: false})
     }
-
+    showAddUser = ()=>{
+        this.setState({show: true})
+    }
+    showModal = e => {
+        this.setState({
+          show: !this.state.show
+        });
+      };
     deploy = ()=>{
         console.log("Deploy")
         this.handleModalClose()
@@ -130,7 +138,8 @@ class Dashboard extends Component {
                 </Table>
                 <br/>
                 <Button variant="primary" size="lg" block onClick={this.fileUpload}>{this.state.deploy_button_text}</Button>
-                
+                <Button variant="primary" size="lg" block onClick={this.showAddUser}>Add User to project</Button>
+                <AddUser onClose={this.showModal} showAddUser = {this.state.show}></AddUser>
                 <Modal
                     show={this.state.showFileUpload}
                     onHide={this.state.handleModalClose}

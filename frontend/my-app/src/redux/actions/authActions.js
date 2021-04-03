@@ -88,24 +88,7 @@ export const registerUser = userData => dispatch => {
     // }
     // );
 };
-// export const getUserProjects = userData => dispatch => {
-//   // dispatch({
-//   //   type: RESET_ALL_STATE
-//   // });
-//   axios.get("http://localhost:3000/projects", {params: {email:userData.email}})
-//     .then(res => {
-//       if (res.data.length > 0) {
-//         console.log(res.data)
-//         dispatch(setUserProjects(res.data));
-//       }
-//     })
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       })
-//     });
-// };
+
 export const getUserProjectsAndPods = userData => dispatch => {
   const projReq = axios.get("http://localhost:5000/projects", {params: {email:userData.email}});
   const podsReq = axios.get("http://localhost:3000/allPods", {params: {email:userData.email}});
@@ -189,64 +172,7 @@ export const changeCurrentProject = projData => dispatch =>{
   dispatch(changeCurrentProjState(projData));
 }
 
-// export const verifyEmail = userData => dispatch => {
-//   dispatch({
-//     type: RESET_ALL_STATE
-//   });
-//   axios.post(`verify/${userData.email}/${userData.access_code}`)
-//     .then(res => {
-//       if (res.data.token.length > 0) {
-//         // Set token to localStorage
-//         const token = res.data.token;
-//         localStorage.setItem("jwtToken", token);
-//         // Set token to Auth header
-//         setAuthToken(token);
-//         // Decode token to get user data
-//         const decoded = jwt_decode(token);
-//         // Set current user
-//         dispatch(setCurrentUser(decoded));
-//       }
-//     })
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       })
-//     });
-// };
 
-// export const updateProfile = (userData) => dispatch => {
-//   axios.put(`/profile/${userData.user_id}`, userData)
-//     .then(res => {
-//       if (res.data.token.length > 0) {
-//         // Set token to localStorage
-//         const token = res.data.token;
-//         localStorage.setItem("jwtToken", token);
-//         // Set token to Auth header
-//         setAuthToken(token);
-//         // Decode token to get user data
-//         const decoded = jwt_decode(token);
-//         // Set current user
-//         dispatch(setCurrentUser(decoded));
-//         dispatch({
-//           type: GET_SUCCESS_MSG,
-//           payload: res.data
-//         });
-//         dispatch({
-//           type: RESET_ERROR_STATE
-//         });
-//       }
-//     })
-//     .catch(err => {
-//       dispatch({
-//         type: GET_ERRORS,
-//         payload: err.response.data
-//       });
-//       dispatch({
-//         type: RESET_SUCCESS_STATE
-//       });
-//     });
-// };
 
 // Set logged in user
 export const setCurrentUser = decoded => {
@@ -300,8 +226,7 @@ export const logoutUser = (history) => dispatch => {
     console.log("logging user out");
   localStorage.removeItem("jwtToken");
   firebase.auth().signOut();
-//   localStorage.removeItem("cart_store_id");
-//   localStorage.removeItem("cart_items");
+
   // Remove auth header for future requests
   setAuthToken(false);
   // Set current user to empty object {} which will set isAuthenticated to false

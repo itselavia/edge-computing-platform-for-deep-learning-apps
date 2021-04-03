@@ -132,51 +132,7 @@ class Register extends Component {
                     </Form.Group>
                   </Form.Row>
 
-                  {/* <Form.Row>
-                    <Form.Group as={Col} controlId="address">
-                      <Form.Label><b>Street Address</b></Form.Label>
-                      <Form.Control name="address"
-                        type="text"
-                        onChange={this.onChange}
-                        placeholder="Enter your street address"
-                        pattern="^[A-Za-z0-9,.#- ]+$"
-                        required />
-                    </Form.Group>
-                  </Form.Row>
-
-                  <Form.Row>
-                    <Form.Group as={Col} controlId="city">
-                      <Form.Label><b>City</b></Form.Label>
-                      <Form.Control name="city"
-                        type="text"
-                        onChange={this.onChange}
-                        placeholder="Enter your city"
-                        pattern="^[A-Za-z ]+$"
-                        required />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId="state">
-                      <Form.Label><b>State</b></Form.Label>
-                      <Form.Control name="state"
-                        type="text"
-                        onChange={this.onChange}
-                        placeholder="Enter your state"
-                        pattern="^[A-Za-z ]+$"
-                        required />
-                    </Form.Group>
-                  </Form.Row>
-
-                  <Form.Row>
-                    <Form.Group as={Col} controlId="zip">
-                      <Form.Label><b>Zip Code</b></Form.Label>
-                      <Form.Control name="zip"
-                        type="text"
-                        onChange={this.onChange}
-                        placeholder="Enter your zip code"
-                        pattern="^[0-9]{5}$"
-                        required />
-                    </Form.Group>
-                  </Form.Row> */}
+                
 
                   <div className="row">
                     <div className="col-md-12 text-center p-2">
