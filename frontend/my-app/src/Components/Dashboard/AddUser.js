@@ -5,6 +5,9 @@ import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Axios from 'axios';
+import config from '../../config/app-config'
+
+Axios.defaults.baseURL = config.api_host;
 
 class AddUser extends Component {
     onClose = e => {
@@ -16,7 +19,7 @@ class AddUser extends Component {
             project_id: this.props.current_project.project_id
         }
 
-       Axios.post("http://localhost:5000/addProjectUser", userData).then((response)=>{
+       Axios.post("addProjectUser", userData).then((response)=>{
             console.log(response);
             if(response.status === 201) {
                 alert("User Added successfully");
