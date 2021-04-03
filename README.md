@@ -42,14 +42,15 @@ ssh_username              = "akshay"
 9. Run ```make cluster-plan``` to view all the infrastructure components Terraform will create in Google Cloud
 10. Run ```make cluster-deploy``` which will start creating the cluster infrastructure on GCP.
 10. Run ```make deploy-services``` to deploy the platform microservices to the Kubernetes cluster
-11. The kubeconfig file for the Kubernetes cluster is downloaded to infra/terraform/modules/kubernetes/config. Run the following command to setup KUBECONFIG
+11. To access the model manager service, get the IP of the Kubernetes worker node from the GCP console. And paths cen be assecced as: http://K8S_WORKER_NODE_IP/getAllPods
+12. The kubeconfig file for the Kubernetes cluster is downloaded to infra/terraform/modules/kubernetes/config. Run the following command to setup KUBECONFIG
 ```
 export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
 ```
-12. Run ```kubectl get nodes``` to see the worker nodes and edge nodes of the cluster
-13. If the nodes are not visible, it’s possible that the cluster setup is still in progress. To view the logs for cluster setup, ssh into the node via the GCP Virtual Machines UI, and tail the /var/log/user-data.log file on any node.
-14. If you want to add or remove any nodes from the existing cluster, simply edit the “terraform.tfvars” file with desired values for variables ```k8s_worker_node_count``` or/and ```edge_node_count``` and run ```make cluster-deploy```
-15. To connect to the MYSQL database from your terminal:
+13. Run ```kubectl get nodes``` to see the worker nodes and edge nodes of the cluster
+14. If the nodes are not visible, it’s possible that the cluster setup is still in progress. To view the logs for cluster setup, ssh into the node via the GCP Virtual Machines UI, and tail the /var/log/user-data.log file on any node.
+15. If you want to add or remove any nodes from the existing cluster, simply edit the “terraform.tfvars” file with desired values for variables ```k8s_worker_node_count``` or/and ```edge_node_count``` and run ```make cluster-deploy```
+16. To connect to the MYSQL database from your terminal:
 ```mysql --host=`terraform -chdir=infra/terraform output database_ip` --user=USERNAME --password```
 
 ### User Workflow
