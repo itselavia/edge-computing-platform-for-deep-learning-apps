@@ -66,13 +66,19 @@ def login():
     userExists = cur.execute("SELECT name FROM user WHERE email_id=%s",
                              (user_email, ))
     if (userExists == 0):
-        
+
         #return "User Doesn't Exist", 401
-        token = jwt.encode({'userExists': False,'email': user_email}, 'top-secret-phrase')
+        token = jwt.encode({
+            'userExists': False,
+            'email': user_email
+        }, 'top-secret-phrase')
         return jsonify({'token': token}), 201
 
     else:
-        token = jwt.encode({'userExists': True,'email': user_email}, 'top-secret-phrase')
+        token = jwt.encode({
+            'userExists': True,
+            'email': user_email
+        }, 'top-secret-phrase')
         return jsonify({'token': token}), 201
 
 
@@ -239,7 +245,7 @@ def getOrDeleteProject():
         mysql.connection.commit()
         return 'Deleted', 204
 
-    
+
 @app.route("/project/uploadModel", methods=['POST'])
 def uploadModel():
     """
@@ -263,6 +269,7 @@ def uploadModel():
     time.sleep(5)
     return "uploadModel", 201
 
+
 @app.route("/project/<id>/convertModel", methods=['POST'])
 def convertModel(id):
     return "convertModel", 201
@@ -271,6 +278,7 @@ def convertModel(id):
 @app.route("/project/<id>/deployModel", methods=['POST'])
 def deployModel(id):
     return "deployModel", 201
-    
+
+
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5000)
+    app.run(host='0.0.0.0', port=5000)
