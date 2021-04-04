@@ -37,6 +37,11 @@ deploy-services: cluster-deploy
 	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
 	kubectl apply -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}
 
+	gcloud config set project ${PROJECT_ID}
+	$(eval WORKER_IP := $(shell gcloud compute instances list | grep worker | awk '{print $$5}' | head -n 1))
+	echo "Model Manager IP Address: " ${WORKER_IP}:32000
+
+
 delete-services:
 	kubectl delete -f backend/model_manager/deploy --kubeconfig=infra/terraform/modules/kubernetes/config
 	rm -f backend/model_manager/deploy/configmap.yaml

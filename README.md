@@ -4,7 +4,7 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 ### Prerequisites:
 - Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM, Cloud SQL
 - If you're enabling the APIs for the first time, wait ~20-30 minutes before applying Terraform. The GCP API activation does not take immediate effect
-- Install gsutil
+- Install gsutil, gcloud
 - Ensure ```make``` is installed 
 - Login to DockerHub account (if you want to push the platform images to your own DockerHub account)
 
@@ -42,7 +42,7 @@ ssh_username              = "akshay"
 9. Run ```make cluster-plan``` to view all the infrastructure components Terraform will create in Google Cloud
 10. Run ```make cluster-deploy``` which will start creating the cluster infrastructure on GCP.
 10. Run ```make deploy-services``` to deploy the platform microservices to the Kubernetes cluster
-11. To access the model manager service, get the IP of the Kubernetes worker node from the GCP console. And paths cen be assecced as: http://K8S_WORKER_NODE_IP/getAllPods
+11. The output of the previous step will contain the public address to access the model manager service. Paths can be assecced as: http://K8S_WORKER_NODE_IP/getAllPods
 12. The kubeconfig file for the Kubernetes cluster is downloaded to infra/terraform/modules/kubernetes/config. Run the following command to setup KUBECONFIG
 ```
 export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
