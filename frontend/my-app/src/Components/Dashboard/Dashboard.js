@@ -60,7 +60,16 @@ class Dashboard extends Component {
         this.setState({showFileUpload: true})
         this.setState({showDeployModal: false})
     }
-
+    onChangeModel = (e)=>{
+        this.setState({
+            model_file : e.target.files[0]
+        })
+    }
+    onChangeInference = (e)=>{
+        this.setState({
+            inference_file : e.target.files[0]
+        })
+    }
     deploymentModal = ()=>{
        
         const modelData = {
@@ -156,7 +165,7 @@ class Dashboard extends Component {
                             id="model_file"
                             label="Upload Tensorflow Model"
                             data-browse="Select"
-                            onChange={this.onChange}
+                            onChange={this.onChangeModel}
                             
                         />
                         </div>
@@ -166,7 +175,7 @@ class Dashboard extends Component {
                             id="inference_file"
                             label="Upload Inference file"
                             data-browse="Select"
-                            onChange={this.onChange}
+                            onChange={this.onChangeInference}
                             
                         />
                         </div>
