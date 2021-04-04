@@ -2,7 +2,7 @@ import axios from "axios";
 import setAuthToken from "../../firebase/setAuthToken";
 import jwt_decode from "jwt-decode";
 import firebase from "firebase";
-
+import config from "../../config/app-config"
 import {
   GET_ERRORS,
   SET_CURRENT_USER,
@@ -18,36 +18,36 @@ import {
   USER_LOADING_STOP
 } from "./action-types";
 
-// Login - get user token
+
+axios.defaults.baseURL = config.api_host;
 axios.defaults.withCredentials = true;
+
+
 export const loginUser = userData => dispatch => {
   dispatch({
     type: RESET_ALL_STATE
   });
-  axios.post("http://localhost:5000/login", userData)
+  axios.post("login", userData)
     .then(res => {
-      console.log("userdata ---------------------"+userData)
-      console.log(userData)
-       console.log(res.data)
+
       if (res.data.token.length > 0) {
-          console.log("in action of login")
-         // console.log(res.data)
-        // Set token to localStorage
+        console.log("in action of login")
+
+        //                                    Set token to localStorage                          
         const token = res.data.token;
-       localStorage.setItem("jwtToken", token);
+        localStorage.setItem("jwtToken", token);
         // Set token to Auth header
-       setAuthToken(token);
+        setAuthToken(token);
         // Decode token to get user data
         const decoded = jwt_decode(token);
         // Set current user
         // const decoded = {userExists:false, email: "aish@gmail.com"}
-        console.log(token)
         dispatch(setCurrentUser(decoded));
       }
 
     })
     .catch(err => {
-        console.log(err)
+      console.log(err)
       dispatch({
         type: GET_ERRORS,
         payload: err.response.data
@@ -56,49 +56,34 @@ export const loginUser = userData => dispatch => {
     );
 };
 
+
 export const registerUser = userData => dispatch => {
   dispatch({
     type: RESET_ALL_STATE
   });
-  axios.post("http://localhost:5000/newUser", userData)
+  axios.post("newUser", userData)
     .then(res => {
       console.log(res);
-      userData = {userExists:true, email:userData.email, phone:userData.phone, name:userData.name}
+      userData = { userExists: true, email: userData.email, phone: userData.phone, name: userData.name }
       dispatch(setCurrentUser(userData))
-      
-      // if (res.data.token.length > 0) {
-      //   // Set token to localStorage
-      //   const token = res.data.token;
-      //   localStorage.setItem("jwtToken", token);
-      //   // Set token to Auth header
-      //   setAuthToken(token);
-      //   // Decode token to get user data
-      //   const decoded = jwt_decode(token);
-      //   // Set current user
-
-      //   dispatch(setCurrentUser(decoded));
-      // }
-
     })
-    // .catch(err => {
-    //   dispatch({
-    //     type: GET_ERRORS,
-    //     payload: err.response.data
-    //   })
-    // }
-    // );
+   .catch(err => {
+      console.log(err);
+   }
+   );
 };
 
+
 export const getUserProjectsAndPods = userData => dispatch => {
-  const projReq = axios.get("http://localhost:5000/projects", {params: {email:userData.email}});
-  const podsReq = axios.get("http://localhost:3000/allPods", {params: {email:userData.email}});
+  const projReq = axios.get("projects", { params: { email: userData.email } });
+  const podsReq = axios.get("http://localhost:3000/allPods", { params: { email: userData.email } });
 
   axios.all([projReq, podsReq]).then(axios.spread((...response) => {
     const res1 = response[0];
     const res2 = response[1];
     console.log(res2)
-    if(res1.data.length>=0 && res2.data.length>=0) {
-      
+    if (res1.data.length >= 0 && res2.data.length >= 0) {
+
       dispatch(setUserProjects(res1.data));
       dispatch(setUserPods(res2.data));
     }
@@ -107,31 +92,18 @@ export const getUserProjectsAndPods = userData => dispatch => {
   })
 }
 
-export const createProjectAction = projData => dispatch =>{
-  axios.post("http://localhost:5000/newProject", projData)
+
+export const createProjectAction = projData => dispatch => {
+  axios.post("newProject", projData)
     .then(res => {
-      
-       console.log(res.data)
-      // if (res.data.token.length > 0) {
-      //     console.log("in action of login")
-      //    // console.log(res.data)
-      //   // Set token to localStorage
-      //   const token = res.data.token;
-      //  localStorage.setItem("jwtToken", token);
-      //   // Set token to Auth header
-      //  setAuthToken(token);
-      //   // Decode token to get user data
-      //   const decoded = jwt_decode(token);
-      //   // Set current user
-      //   // const decoded = {userExists:false, email: "aish@gmail.com"}
-      //   console.log(token)
-      //   dispatch(setCurrentUser(decoded));
-      // }
+
+      console.log(res.data)
 
     })
 }
 
-export const uploadFile = (modelData, inferData) => dispatch =>{
+
+export const uploadFile = (modelData, inferData) => dispatch => {
   console.log(modelData)
   console.log(inferData)
   let model_formData = new FormData();
@@ -149,8 +121,8 @@ export const uploadFile = (modelData, inferData) => dispatch =>{
   // }
   const headers = {
     'Content-Type': 'multipart/form-data',
-}
-  const modelReq = axios.post("http://localhost:5000/project/uploadModel", model_formData, headers);
+  }
+  const modelReq = axios.post("project/uploadModel", model_formData, headers);
   // const inferReq = axios.post("http://localhost:5000/allPods", {params: {email:userData.email}});
   dispatch(setUserLoading())
   axios.all([modelReq]).then(axios.spread((...response) => {
@@ -159,7 +131,7 @@ export const uploadFile = (modelData, inferData) => dispatch =>{
     console.log(res1)
     dispatch(stopUserLoading())
     // if(res1.data.length>=0 ) {
-      
+
     //   dispatch(setUserProjects(res1.data));
     //   dispatch(setUserPods(res2.data));
     // }
@@ -168,19 +140,20 @@ export const uploadFile = (modelData, inferData) => dispatch =>{
   })
 }
 
-export const changeCurrentProject = projData => dispatch =>{
+
+export const changeCurrentProject = projData => dispatch => {
   dispatch(changeCurrentProjState(projData));
 }
 
 
-
-// Set logged in user
 export const setCurrentUser = decoded => {
   return {
     type: SET_CURRENT_USER,
     payload: decoded
   };
 };
+
+
 export const setUserProjects = data => {
   return {
     type: SET_USER_PROJECTS,
@@ -188,18 +161,22 @@ export const setUserProjects = data => {
   }
 }
 
+
 export const changeCurrentProjState = data => {
   return {
     type: SET_CURRENT_PROJECT,
     payload: data
   }
 }
+
+
 export const setUserPods = data => {
   return {
     type: SET_USER_PODS,
     payload: data
   }
 }
+
 
 export const setUserInfo = data => {
   return {
@@ -215,15 +192,17 @@ export const setUserLoading = () => {
   };
 };
 
+
 export const stopUserLoading = () => {
   return {
     type: USER_LOADING_STOP
   };
 };
-// Logout
+
+
 export const logoutUser = (history) => dispatch => {
   // Remove token from local storage
-    console.log("logging user out");
+  console.log("logging user out");
   localStorage.removeItem("jwtToken");
   firebase.auth().signOut();
 
@@ -243,9 +222,11 @@ export const logoutUser = (history) => dispatch => {
   }
 };
 
+
 export const startLoading = () => async dispatch => {
   dispatch({ type: '_REQUEST' })
 }
+
 
 export const endLoading = () => async dispatch => {
   dispatch({ type: '_SUCCESS' })

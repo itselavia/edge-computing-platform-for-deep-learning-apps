@@ -29,7 +29,7 @@ export default class Devices extends Component {
             <Container style={{marginTop:"20px"}}>
                 <Select options={this.state.data}>
                 
-            </Select>
+                </Select>
             </Container>
         )
     }
