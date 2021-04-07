@@ -27,3 +27,4 @@
 
 # Python Virtual Environment
 backend/flask_service/venv
+backend/flask_service/credentials/credentials.json
