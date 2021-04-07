@@ -34,13 +34,11 @@ class Dashboard extends Component {
                     this.setState({deploy_button_text: "Edit Deployment"})
                     return <React.Fragment>
                     <tr>
-                        <td>{pod.pod_id}</td>
                         <td>{pod.pod_name}</td>
-                        <td>{pod.pod_status}</td>
-                        <td>{pod.pod_restarts}</td>
-                        <td>{pod.pod_age}</td>
-                        <td>{pod.pod_cpu}</td>
-                        <td>{pod.pod_memory}</td>
+                        <td>{pod.project_name}</td>
+                        <td>{pod.node_name}</td>
+                        <td>{pod.status}</td>
+                        <td>{pod.created_at}</td>
                     </tr>
                 </React.Fragment>
                 }
@@ -163,13 +161,12 @@ class Dashboard extends Component {
                 <Table striped bordered hover responsive >
                     <thead>
                         <tr>
-                            <th>Pod Id</th>
+                           
                             <th>Pod Name</th>
-                            <th>Pod Status</th>
-                            <th>Pod Restarts</th>
-                            <th>Pod Age</th>
-                            <th>Pod CPU</th>
-                            <th>Pod Memory</th>
+                            <th>Project Name</th>
+                            <th>Node Name</th>
+                            <th>Status</th>
+                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody>
