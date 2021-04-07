@@ -249,40 +249,43 @@ def getOrDeleteProject():
 
 @app.route("/project/uploadModel", methods=['POST'])
 def uploadModel():
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    os.environ[
+        'GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
     username = request.form["username"]
     projectname = request.form["projectname"]
     source_file_name = request.files["modelfile"].filename
-    request.files["modelfile"].save("models/"+source_file_name)
+    request.files["modelfile"].save("models/" + source_file_name)
     storage_client = storage.Client()
-    bucket_name='finalprojectenv-storage'
+    bucket_name = 'edgecomputing-310003-tf-saved-models'
     bucket = storage_client.bucket(bucket_name)
-    destination_blob_name = projectname+"/modelfile/"+source_file_name
+    destination_blob_name = projectname + "/modelfile/" + source_file_name
     blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename("models/"+source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    blob.upload_from_filename("models/" + source_file_name)
+    print("File {} uploaded to {}.".format(source_file_name,
+                                           destination_blob_name))
     print(request.form)
     time.sleep(5)
-    print("done:::::::")
     return "uploadModel", 201
+
 
 @app.route("/project/uploadInference", methods=['POST'])
 def uploadInference():
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    os.environ[
+        'GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
     username = request.form["username"]
     projectname = request.form["projectname"]
     source_file_name = request.files["inferencefile"].filename
-    request.files["inferencefile"].save("inferencefiles/"+source_file_name)
+    request.files["inferencefile"].save("inferencefiles/" + source_file_name)
     storage_client = storage.Client()
-    bucket_name='finalprojectenv-storage'
+    bucket_name = 'edgecomputing-310003-tf-saved-models'
     bucket = storage_client.bucket(bucket_name)
-    destination_blob_name = projectname+"/infrenecefile/"+source_file_name
+    destination_blob_name = projectname + "/infrenecefile/" + source_file_name
     blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename("inferencefiles/"+source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
+    blob.upload_from_filename("inferencefiles/" + source_file_name)
+    print("File {} uploaded to {}.".format(source_file_name,
+                                           destination_blob_name))
     print(request.form)
     time.sleep(5)
-    print("done:::::::")
     return "uploadModel", 201
 
 
