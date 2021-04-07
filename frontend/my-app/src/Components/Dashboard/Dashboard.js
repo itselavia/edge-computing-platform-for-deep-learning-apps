@@ -6,7 +6,7 @@ import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
-import {uploadFile} from "../../redux/actions/authActions"
+import {uploadFile, getProjectUsers} from "../../redux/actions/authActions"
 import Loader from "react-loader-spinner";
 import AddUser from './AddUser';
 import DeployModal from './DeployModal';
@@ -18,7 +18,8 @@ class Dashboard extends Component {
             displayPods:[],
             deploy_button_text: "Create Deployment",
             showFileUpload: false,
-            showDeployModal: false
+            showDeployModal: false,
+            project_users:{}
         }
     }
     componentDidMount(){
@@ -48,6 +49,29 @@ class Dashboard extends Component {
                 displayPods:displayPods
             })
         }
+        if(!! this.props.current_project) {
+            const proj_info = {
+                project_id : this.props.current_project.project_id
+            }
+            
+            this.props.getProjectUsers(proj_info)
+        }
+    }
+    
+    componentWillReceiveProps(nextprops) {
+        console.log("calling next props on dashboard")
+        console.log(nextprops.projects.project_users)
+        this.setState({
+            project_users : nextprops.projects.project_users
+        },()=>{
+            const users = Object.keys(this.state.project_users).map((key, index) => (
+                <tr><td>{key}</td></tr>
+            ))
+            this.setState({
+                users:users
+            })
+        })
+        
     }
 
     onChange = e => {
@@ -154,6 +178,10 @@ class Dashboard extends Component {
                 </Table>
                 <br/>
                 <Button variant="primary" size="lg" block onClick={this.fileUpload}>{this.state.deploy_button_text}</Button>
+                <Table>
+                    <th>Current Users Associated to this project</th>
+                    {this.state.users}
+                </Table>
                 <Button variant="primary" size="lg" block onClick={this.showAddUser}>Add User to project</Button>
                 <AddUser onClose={this.showModal} showAddUser = {this.state.show}></AddUser>
                 <DeployModal onClose={this.launchDeployModal} showDepModal = {this.state.showDeployModal}></DeployModal>
@@ -205,6 +233,7 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
     uploadFile: PropTypes.func.isRequired,
+    getProjectUsers: PropTypes.func.isRequired,
     auth: PropTypes.object.isRequired,
     pods: PropTypes.object.isRequired,
     projects: PropTypes.object.isRequired,
@@ -221,4 +250,4 @@ const mapStateToProps = state => ({
     success: state.success
 });
 
-export default connect(mapStateToProps, { uploadFile })(Dashboard);
+export default connect(mapStateToProps, { uploadFile, getProjectUsers })(Dashboard);

@@ -7,13 +7,13 @@ import { connect } from "react-redux";
 import Axios from 'axios';
 import config from '../../config/app-config'
 
-Axios.defaults.baseURL = config.api_host;
+// Axios.defaults.baseURL = config.pods_info_base;
 
 class DeployModal extends Component {
     constructor() {
         super();
         this.state = {
-            labels:[]
+            labels:""
         }
     }
     onClose = e => {
@@ -25,18 +25,24 @@ class DeployModal extends Component {
             num_replicas: this.state.replicas,
             memory_request: this.state.memory_request,
             cpu_request: this.state.cpu_request,
-            label: this.state.label,
+            project_name: this.props.current_project.project_name, 
+            labels: [],
             gpu_support: this.state.gpu_support
         }
+        const labelArr = this.state.label.split(':')
+        deployData.labels.push({
+            key:labelArr[0],
+            value:labelArr[1]
+        })
         console.log(deployData)
-
-    //    Axios.post("addProjectUser", deployData).then((response)=>{
-    //         console.log(response);
-    //         if(response.status === 201) {
-    //             alert("User Added successfully");
-    //             this.onClose();
-    //         }
-    //    })
+        const email = this.props.current_project.owner_email
+       Axios.post(config.pods_info_base+"deployModel", deployData, {params : {email:email}}).then((response)=>{
+            console.log(response);
+            if(response.status === 201) {
+                alert("User Added successfully");
+                this.onClose();
+            }
+       })
     }
 
     onChange = e => {
