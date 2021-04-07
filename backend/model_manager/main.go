@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/rs/cors"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -324,14 +324,12 @@ func int32Ptr(i int32) *int32 { return &i }
 
 func main() {
 	r := mux.NewRouter()
-	handler := cors.Default().Handler(r)
 	// Routes consist of a path and a handler function.
 	r.HandleFunc("/", IndexHandler)
-	r.HandleFunc("/convertModel", ConvertModelHandler).Methods("POST")
-	r.HandleFunc("/deployModel", DeployModelHandler).Methods("POST")
-	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST")
-	r.HandleFunc("/getAllPods", GetAllPodsHandler).Methods("GET")
+	r.HandleFunc("/convertModel", ConvertModelHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/deployModel", DeployModelHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST", "OPTIONS")
+	r.HandleFunc("/getAllPods", GetAllPodsHandler).Methods("GET", "OPTIONS")
 
-	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":8000", handler))
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"http://localhost:3001"}), handlers.AllowCredentials())(r)))
 }

@@ -18,7 +18,7 @@ test-tflite-model-deploy:
 	$(eval BUCKET_URL := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
 	gsutil cp example/inference.py ${BUCKET_URL}/akshay.elavia@gmail.com/Sample_Project/
 
-deploy-services: cluster-deploy
+deploy-services:
 	$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
 	$(eval PROJECT_ID := $(shell terraform -chdir=infra/terraform output project_id))
 	$(eval FUNCTION_NAME := $(shell terraform -chdir=infra/terraform output function_name))
