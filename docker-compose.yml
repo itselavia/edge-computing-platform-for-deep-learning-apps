@@ -4,29 +4,28 @@
 #  * @desc [description]
 #  */
 
-version: '3.7'
+version: "3.7"
 
 services:
-  
   flask-backend:
     container_name: flask-backend
     build:
       context: ./backend/flask_service
       dockerfile: Dockerfile
     volumes:
-      - './backend/flask_service/:/app'
+      - "./backend/flask_service/:/app"
     ports:
       - 5000:5000
     networks:
       - edgenetwork
-  sample:
-    container_name: sample
+  react-frontend:
+    container_name: react-frontend
     build:
       context: ./frontend/my-app/
       dockerfile: Dockerfile
     volumes:
-      - './frontend/my-app/:/app'
-      - '/app/node_modules'
+      - "./frontend/my-app/:/app"
+      - "/app/node_modules"
     ports:
       - 3001:3000
     depends_on:
