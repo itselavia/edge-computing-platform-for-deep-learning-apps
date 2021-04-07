@@ -7,7 +7,7 @@ cluster-plan: cluster-init
 cluster-deploy: cluster-init
 	terraform -chdir=infra/terraform apply --auto-approve
 
-cluster-destroy: delete-services
+cluster-destroy: 
 	terraform -chdir=infra/terraform destroy --auto-approve
 
 test-converter-function:

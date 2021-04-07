@@ -4,7 +4,7 @@ This is the code repository for CMPE295 Masters Project. Part of the curriculum 
 ### Prerequisites:
 - Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM, Cloud SQL
 - If you're enabling the APIs for the first time, wait ~20-30 minutes before applying Terraform. The GCP API activation does not take immediate effect
-- Install gsutil, gcloud
+- Install gsutil, gcloud locally
 - Ensure ```make``` is installed 
 - Login to DockerHub account (if you want to push the platform images to your own DockerHub account)
 
