@@ -1,0 +1,25 @@
+# spinnaker-role-and-rolebinding-target.yml
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cmpe295bedge-role
+  namespace: cmpe295bedge # Should be namespace you are granting access to
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cmpe295bedge-rolebinding
+  namespace: cmpe295bedge # Should be namespace you are granting access to
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cmpe295bedge-role # Should match name of Role
+subjects:
+- namespace: cmpe295bedge # Should match namespace where SA lives
+  kind: ServiceAccount
+  name: cmpe295bedge # Should match service account name, above

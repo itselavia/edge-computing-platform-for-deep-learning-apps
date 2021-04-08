@@ -1,9 +1,9 @@
-FROM tensorflow/tensorflow:2.4.0
+FROM python:3.8
 
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN apt-get -y update && apt-get install -y ffmpeg libsm6 libxext6 && pip3 install --no-cache-dir -r requirements.txt
 
 COPY startup.sh ./
 RUN chmod +x startup.sh

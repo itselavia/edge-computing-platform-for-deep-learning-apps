@@ -288,8 +288,6 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
 	}
 
-	namespacesClient := clientset.CoreV1().Namespaces()
-
 	userNamespace := strings.Replace(email, ".", "-", -1)[:strings.Index(email, "@")]
 
 	namespace := &apiv1.Namespace{
@@ -298,7 +296,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	result, err := namespacesClient.Create(context.TODO(), namespace, metav1.CreateOptions{})
+	result, err := clientset.CoreV1().Namespaces().Create(context.TODO(), namespace, metav1.CreateOptions{})
 
 	if err != nil {
 		w.Write([]byte("Unable to create Namespace for the user: " + email + " : " + err.Error() + "\n"))
