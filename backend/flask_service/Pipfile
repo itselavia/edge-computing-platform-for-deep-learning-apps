@@ -10,8 +10,6 @@ flask = "*"
 flask-mysqldb = "*"
 pyjwt = "*"
 "google.cloud.storage" = "*"
-google = {cloud = storage = "*"
-}
 
 [requires]
 python_version = "3.8"
