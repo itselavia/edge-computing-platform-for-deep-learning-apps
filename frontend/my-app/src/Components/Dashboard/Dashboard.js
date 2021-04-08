@@ -114,8 +114,16 @@ class Dashboard extends Component {
     launchDeployModal = (e)=>{
         this.setState({
             showDeployModal: !this.state.showDeployModal
+        },()=>{
+            const proj_info = {
+                project_id : this.props.current_project.project_id
+            }
+            this.props.getProjectUsers(proj_info)
         })
     }
+
+    
+
 
     handleModalClose = ()=>{
         this.setState({showFileUpload: false})

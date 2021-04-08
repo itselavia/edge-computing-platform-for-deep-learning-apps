@@ -8,7 +8,7 @@ import DonutChart from 'react-donut-chart';
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { Col, Row ,Nav, Form} from 'react-bootstrap';
-
+import file from '../../kubeconfig-sa-cmpe295bedge.yaml'
 class MyProject extends Component {
     
     constructor(props) {
@@ -161,7 +161,7 @@ class MyProject extends Component {
 
                    <Container>
                        <br/>
-                       <h1>Project Summary</h1>
+                       <h4>Project Summary  <a href={file} download="kubeconfig-sa-cmpe295bedge.yaml">download config</a></h4>
                        <br/>
                        <Row xs={1} md={2}>
                            <Col >
