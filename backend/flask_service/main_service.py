@@ -300,7 +300,7 @@ def uploadInference():
     storage_client = storage.Client()
     bucket_name = 'edgecomputing-310003-tf-saved-models'
     bucket = storage_client.bucket(bucket_name)
-    destination_blob_name = projectname + "/infrenecefile/" + source_file_name
+    destination_blob_name = projectname + "/inferencefile/" + source_file_name
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("inferencefiles/" + source_file_name)
     print("File {} uploaded to {}.".format(source_file_name,
