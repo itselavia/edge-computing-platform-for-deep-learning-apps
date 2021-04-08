@@ -121,7 +121,7 @@ def download_image(url:str):
         # Open a local file with wb ( write binary ) permission.
         with open(filename,'wb') as f:
             shutil.copyfileobj(r.raw, f)
-        print('Image sucessfully Downloaded: ',filename)
+        print('Image sucessfully Downloaded: ')
         return filename
     else:
         print('Image Couldn\'t be retreived')
@@ -160,9 +160,11 @@ def unit_test():
     url1 = "https://static.toiimg.com/photo/msid-72295960/72295960.jpg?545889"
     url2 = "https://www.dmarge.com/wp-content/uploads/2021/01/dwayne-the-rock-.jpg"
     url3 =  "https://cdn.shopify.com/s/files/1/1245/1481/products/2_DIAMOND_BLACK_1_1024x1024.jpg?v=1597774901"
-
+    print("unit test 1 is :")
     inference(url1)
+    print("unit test 2 is :")
     inference(url2)
+    print("unit test 3 is :")
     inference(url3)
 
 
@@ -171,13 +173,17 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--url', help='Image URL', required=False)
     args = parser.parse_args()
-    # loading model
-    
-    print("running unit tests")
-    if(len(vars(args)) == 0):
-        unit_test()
+    if args.url is not None:
+        inference(args.url)
     else:
-        inference( args.url)
+        unit_test()
+
+    # loading model
+    #if(len(vars(args)) == 1):
+    #    print("running unit tests")
+    #    unit_test()
+    #else:
+    #    
     
 if __name__ == '__main__':
     main()
