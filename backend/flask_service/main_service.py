@@ -7,6 +7,8 @@ import datetime
 from flask import jsonify, json
 import os
 import time
+import requests
+import os
 
 app = Flask(__name__)
 
@@ -15,6 +17,9 @@ app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_HOST'] = '34.94.126.181'
 app.config['MYSQL_DB'] = 'final_project_db'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
+os.environ['MODEL_MANAGER_SERVICE_HOST'] = '35.235.110.141'
+os.environ['MODEL_MANAGER_SERVICE_PORT'] = '32000'
 
 mysql = MySQL(app)
 
@@ -51,7 +56,23 @@ def newUser():
         cur.execute("INSERT INTO user VALUES (%s,%s,%s,'user')",
                     (name, email, phone))
         mysql.connection.commit()
-        return "Created", 201
+
+        URL = "http://"
+        URL += str(os.environ['MODEL_MANAGER_SERVICE_HOST'])
+        URL += ":"
+        URL += str(os.environ['MODEL_MANAGER_SERVICE_PORT'])
+        URL += "/createUser"
+        print(URL)
+
+        PARAMS = {'email': email}
+
+        r = requests.post(url=URL, params=PARAMS)
+        print(r.status_code)
+
+        if r.status_code == 200:
+            return "Created", 201
+        else:
+            return "Could not create user on the model manager", 401
 
     else:
         return "User Already Exists", 409
