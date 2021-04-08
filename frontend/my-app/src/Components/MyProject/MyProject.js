@@ -185,7 +185,16 @@ class MyProject extends Component {
                             </Col>
                        </Row>
                     </Container>
-            
+                <br/>
+                <h6>Steps for log and SSH:</h6>
+                <ol>
+                <li>install kubectl locally</li>
+                <li>download the config file</li>
+                <li>to view the logs of any pod:
+                    kubectl logs POD_NAME --kubeconfig CONFIG_FILE_PATH</li>
+                <li>To ssh into the pod : kubectl exec -it POD_NAME --kubeconfig CONFIG_FILE_PATH -- /bin/sh</li>
+
+                </ol>
                 <Modal
                 show={this.state.showCreateProject}
                 onHide={this.state.handleModalClose}
