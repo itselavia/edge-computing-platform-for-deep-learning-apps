@@ -41,7 +41,8 @@ class MyProject extends Component {
             projects:props.projects.projects,
             pods:props.pods.pods
         },()=>{
-            if(!!this.state.pods && !!this.state.projects) {
+
+            if( this.state.projects!=null && !!this.state.projects) {
             const displayProjects = this.state.projects.map(proj => 
                
             <React.Fragment>
@@ -54,13 +55,16 @@ class MyProject extends Component {
             </React.Fragment>
             
             );
-           
+            this.setState({
+                displayProjects:displayProjects
+            })
+            }
             var dict = {}
-         
+            if(!!this.state.pods) {
             const displayPods = this.state.pods.map(pod =>
                 {
-                    let x = dict[pod.project_id];
-                    dict[pod.project_id] = x ? dict[pod.project_id] +1 : 1;
+                    let x = dict[pod.project_name];
+                    dict[pod.project_name] = x ? dict[pod.project_name] +1 : 1;
 
                     return <React.Fragment>
                     <tr>
@@ -79,14 +83,14 @@ class MyProject extends Component {
             for (var key in dict) {
                 // check if the property/key is defined in the object itself, not in parent
                 if (dict.hasOwnProperty(key)) {           
-                    pods_per_proj_data.push({value:dict[key], label:"Project"+key})
+                    pods_per_proj_data.push({value:dict[key], label:""+key})
                     console.log(key, dict[key]);
                 }
             }
             console.log(pods_per_proj_data)
 
             this.setState({
-                displayProjects:displayProjects,
+               // displayProjects:displayProjects,
                 displayPods:displayPods,
                 pods_per_proj_data:pods_per_proj_data
             },()=>{

@@ -28,9 +28,9 @@ class Dashboard extends Component {
             this.props.history.push("/login");
         }
 
-        if(!!this.props.pods && !!this.props.current_project) {
+        if(!!this.props.pods.pods && !!this.props.pods && !!this.props.current_project) {
             const displayPods = this.props.pods.pods.map((pod)=>{
-                if(pod.project_id === this.props.current_project.project_id) {
+                if(pod.project_name === this.props.current_project.project_name) {
                     this.setState({deploy_button_text: "Edit Deployment"})
                     return <React.Fragment>
                     <tr>
@@ -127,6 +127,11 @@ class Dashboard extends Component {
     showModal = e => {
         this.setState({
           show: !this.state.show
+        },()=>{
+            const proj_info = {
+                project_id : this.props.current_project.project_id
+            }
+            this.props.getProjectUsers(proj_info)
         });
       };
     deploy = ()=>{
