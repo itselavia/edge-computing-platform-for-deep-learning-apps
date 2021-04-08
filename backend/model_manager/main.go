@@ -68,7 +68,16 @@ func GetAllPodsHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
 	}
 
-	userNamespace := "default"
+	keys, ok := r.URL.Query()["email"]
+
+	if !ok || len(keys[0]) < 1 {
+		w.Write([]byte("Url Param 'email' is missing" + "\n"))
+	}
+
+	email := string(keys[0])
+
+	userNamespace := strings.Replace(email, ".", "-", -1)[:strings.Index(email, "@")]
+
 	pods, err := clientset.CoreV1().Pods(userNamespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		w.Write([]byte("Unable to fetch pod list from " + userNamespace + " namespace: " + err.Error() + "\n"))
@@ -82,7 +91,7 @@ func GetAllPodsHandler(w http.ResponseWriter, r *http.Request) {
 			PodName:     pod.Name,
 			NodeName:    pod.Spec.NodeName,
 			Status:      string(pod.Status.Phase),
-			ProjectName: pod.Labels["project"],
+			ProjectName: pod.Labels["project_name"],
 			CreatedAt:   pod.CreationTimestamp.Time,
 		}
 
@@ -164,6 +173,8 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 
 	email := string(keys[0])
 
+	userNamespace := strings.Replace(email, ".", "-", -1)[:strings.Index(email, "@")]
+
 	decoder := json.NewDecoder(r.Body)
 
 	var input DeployModelInput
@@ -178,23 +189,26 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Unable to create clienset for Kubernetes: " + err.Error() + "\n"))
 	}
 
-	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
+	deploymentsClient := clientset.AppsV1().Deployments(userNamespace)
 
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: input.DeploymentName,
+			Name:      input.DeploymentName,
+			Namespace: userNamespace,
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: int32Ptr(input.NumReplicas),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": "edge",
+					"app":          "edge",
+					"project_name": input.ProjectName,
 				},
 			},
 			Template: apiv1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": "edge",
+						"app":          "edge",
+						"project_name": input.ProjectName,
 					},
 				},
 				Spec: apiv1.PodSpec{
@@ -290,7 +304,39 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Unable to create Namespace for the user: " + email + " : " + err.Error() + "\n"))
 	}
 
-	w.Write([]byte("Created Namespace successfully: " + result.GetObjectMeta().GetName() + "\n"))
+	secret, err := clientset.CoreV1().Secrets("default").Get(context.TODO(), "cloudsql-oauth-credentials", metav1.GetOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to fetch default secret cloudsql-oauth-credentials: " + err.Error() + "\n"))
+	}
+
+	scopedSecretDef := &apiv1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "cloudsql-oauth-credentials",
+			Namespace: userNamespace,
+		},
+		Data: map[string][]byte{
+			"creds": []byte(secret.Data["creds"]),
+		},
+	}
+
+	_, err = clientset.CoreV1().Secrets(userNamespace).Create(context.TODO(), scopedSecretDef, metav1.CreateOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to create scoped secret cloudsql-oauth-credentials: " + err.Error() + "\n"))
+	}
+
+	serviceAccount := &apiv1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      userNamespace,
+			Namespace: userNamespace,
+		},
+	}
+
+	_, err = clientset.CoreV1().ServiceAccounts(userNamespace).Create(context.TODO(), serviceAccount, metav1.CreateOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to create service account for the user: " + email + " : " + err.Error() + "\n"))
+	}
+
+	w.Write([]byte("Created Namespace, Service Account successfully: " + result.GetObjectMeta().GetName() + "\n"))
 
 }
 
