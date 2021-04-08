@@ -106,7 +106,7 @@ LABELS_DICT = {-1: '???',
  88: 'hair',
  89: 'toothbrush'}
 
-TFLITE_FILE_PATH ="../model/ssd_mobilenet_v1_1_metadata_1.tflite"
+TFLITE_FILE_PATH ="model.tflite"
 
 def download_image(url:str):
     filename = url.split("/")[-1]
