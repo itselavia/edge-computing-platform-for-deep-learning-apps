@@ -1,2 +1,4 @@
 gsutil==4.59
 numpy==1.19.5
+requests
+opencv-python

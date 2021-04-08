@@ -9,7 +9,8 @@ verify_ssl = true
 flask = "*"
 flask-mysqldb = "*"
 pyjwt = "*"
-google.cloud.storage = "*"
+"google.cloud.storage" = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

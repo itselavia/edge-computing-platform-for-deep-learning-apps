@@ -15,7 +15,8 @@ import {
   SET_USER_PROJECTS,
   CURRENT_USER_INFO,
   SET_CURRENT_PROJECT,
-  USER_LOADING_STOP
+  USER_LOADING_STOP,
+  SET_PROJECT_USERS
 } from "./action-types";
 
 
@@ -74,21 +75,44 @@ export const registerUser = userData => dispatch => {
 };
 
 
+export const getProjectUsers = proj_info => dispatch => {
+
+  axios.get("projectUsers",{params : {project_id:proj_info.project_id}})
+    .then(res => {
+      console.log(res);
+      dispatch(setProjectUsers(res.data));
+    })
+    .catch(err => {
+      console.log(err);
+    })
+}
+
+
 export const getUserProjectsAndPods = userData => dispatch => {
   const projReq = axios.get("projects", { params: { email: userData.email } });
-  const podsReq = axios.get("http://localhost:3000/allPods", { params: { email: userData.email } });
+  const podsReq = axios.get(config.pods_info_base+"getAllPods", { params: { email: userData.email } });
 
   axios.all([projReq, podsReq]).then(axios.spread((...response) => {
     const res1 = response[0];
     const res2 = response[1];
+    console.log(res1)
     console.log(res2)
-    if (res1.data.length >= 0 && res2.data.length >= 0) {
-
+    if (res1!=null) {
+      if(!!res1 && res1.data.length == 0) {
+        console.log("size == 0")
+        res1.data = [];
+      }
+      console.log("dispatching"+res1.data)
       dispatch(setUserProjects(res1.data));
+    }
+    if(res2!=null) {
+      if(!!res2 && res2.data.length == 0) {
+        res2.data = [];
+      }
       dispatch(setUserPods(res2.data));
     }
   })).catch(errors => {
-
+    console.log(errors)
   })
 }
 
@@ -123,12 +147,13 @@ export const uploadFile = (modelData, inferData) => dispatch => {
     'Content-Type': 'multipart/form-data',
   }
   const modelReq = axios.post("project/uploadModel", model_formData, headers);
-  // const inferReq = axios.post("http://localhost:5000/allPods", {params: {email:userData.email}});
+  const inferReq = axios.post("project/uploadInference", infer_formData, headers);
   dispatch(setUserLoading())
-  axios.all([modelReq]).then(axios.spread((...response) => {
+  axios.all([modelReq, inferReq]).then(axios.spread((...response) => {
     const res1 = response[0];
-    // const res2 = response[1];
+    const res2 = response[1];
     console.log(res1)
+    console.log(res2)
     dispatch(stopUserLoading())
     // if(res1.data.length>=0 ) {
 
@@ -157,6 +182,14 @@ export const setCurrentUser = decoded => {
 export const setUserProjects = data => {
   return {
     type: SET_USER_PROJECTS,
+    payload: data
+  }
+}
+
+
+export const setProjectUsers = data => {
+  return {
+    type: SET_PROJECT_USERS,
     payload: data
   }
 }
