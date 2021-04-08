@@ -42,7 +42,7 @@ class MyProject extends Component {
             pods:props.pods.pods
         },()=>{
 
-            if( this.state.projects!=null && !!this.state.projects) {
+            if( Array.isArray(this.state.projects) && this.state.projects!=null && !!this.state.projects) {
             const displayProjects = this.state.projects.map(proj => 
                
             <React.Fragment>
