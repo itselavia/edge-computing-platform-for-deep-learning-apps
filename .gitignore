@@ -28,3 +28,4 @@
 # Python Virtual Environment
 backend/flask_service/venv
 backend/flask_service/credentials/credentials.json
+use_cases/object_detection/inference/venv
