@@ -13,7 +13,8 @@ class DeployModal extends Component {
     constructor() {
         super();
         this.state = {
-            labels:""
+            labels:"",
+            gpu_support:false
         }
     }
     onClose = e => {
@@ -21,8 +22,9 @@ class DeployModal extends Component {
       };
     submitUser = e => {
         const deployData = {
+            deployment_name: this.state.deployment_name,
             custom_image: this.state.custom_image,
-            num_replicas: this.state.replicas,
+            num_replicas: parseInt(this.state.replicas),
             memory_request: this.state.memory_request,
             cpu_request: this.state.cpu_request,
             project_name: this.props.current_project.project_name, 
@@ -38,8 +40,8 @@ class DeployModal extends Component {
         const email = this.props.current_project.owner_email
        Axios.post(config.pods_info_base+"deployModel", deployData, {params : {email:email}}).then((response)=>{
             console.log(response);
-            if(response.status === 201) {
-                alert("User Added successfully");
+            if(response.status === 200) {
+                alert("Model Deployment scheduled successfully");
                 this.onClose();
             }
        })
@@ -77,6 +79,14 @@ class DeployModal extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
+                             <Form.Group controlId="deployment_name">
+                                <Form.Row>
+                                    <Col sm="3"></Col>
+                                    <Col sm="8">
+                                        <Form.Control placeholder="Deployment Name" onChange={this.onChange}/>
+                                    </Col>
+                                </Form.Row>
+                             </Form.Group>
                             <fieldset>
                                 <Form.Row>
                                     <Col sm="3">
