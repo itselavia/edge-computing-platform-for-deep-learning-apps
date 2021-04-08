@@ -160,12 +160,16 @@ def unit_test():
     url1 = "https://static.toiimg.com/photo/msid-72295960/72295960.jpg?545889"
     url2 = "https://www.dmarge.com/wp-content/uploads/2021/01/dwayne-the-rock-.jpg"
     url3 =  "https://cdn.shopify.com/s/files/1/1245/1481/products/2_DIAMOND_BLACK_1_1024x1024.jpg?v=1597774901"
-    print("unit test 1 is :")
+    print("\n")
+    print("Unit test 1 running...")
     inference(url1)
-    print("unit test 2 is :")
+    print("\n")
+    print("unit test 2 running...")
     inference(url2)
-    print("unit test 3 is :")
+    print("\n")
+    print("unit test 3 running...")
     inference(url3)
+    print("\n")
 
 
 
