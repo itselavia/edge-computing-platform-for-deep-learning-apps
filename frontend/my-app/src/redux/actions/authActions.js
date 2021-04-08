@@ -95,17 +95,24 @@ export const getUserProjectsAndPods = userData => dispatch => {
   axios.all([projReq, podsReq]).then(axios.spread((...response) => {
     const res1 = response[0];
     const res2 = response[1];
+    console.log(res1)
     console.log(res2)
-    if (res1.data.length >= 0) {
-
+    if (res1!=null) {
+      if(!!res1 && res1.data.length == 0) {
+        console.log("size == 0")
+        res1.data = [];
+      }
+      console.log("dispatching"+res1.data)
       dispatch(setUserProjects(res1.data));
-     
     }
-    if(res2.data.length >= 0) {
+    if(res2!=null) {
+      if(!!res2 && res2.data.length == 0) {
+        res2.data = [];
+      }
       dispatch(setUserPods(res2.data));
     }
   })).catch(errors => {
-
+    console.log(errors)
   })
 }
 

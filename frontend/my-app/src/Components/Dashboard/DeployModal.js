@@ -81,7 +81,11 @@ class DeployModal extends Component {
                         <Form>
                              <Form.Group controlId="deployment_name">
                                 <Form.Row>
-                                    <Col sm="3"></Col>
+                                    <Col sm="3">
+                                    <Form.Label>
+                                        <b>Deployment Name</b>
+                                        </Form.Label>
+                                    </Col>
                                     <Col sm="8">
                                         <Form.Control placeholder="Deployment Name" onChange={this.onChange}/>
                                     </Col>

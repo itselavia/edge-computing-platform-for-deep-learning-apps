@@ -30,14 +30,14 @@ class _Navbar extends Component {
                     <Nav className="mr-auto">
                         <Nav.Link href="/">Home</Nav.Link>
                         <Nav.Link href="/projects">My Projects</Nav.Link>
-                        <Nav.Link href="/cluster">Cluster</Nav.Link>
+                        {/* <Nav.Link href="/cluster">Cluster</Nav.Link>
                         <NavDropdown title="Devices" id="basic-nav-dropdown">
                             <NavDropdown.Item href="/addDevice">Add a device</NavDropdown.Item>
                             <NavDropdown.Item href="/viewDevices">View All Devices</NavDropdown.Item>
                             
                             <NavDropdown.Divider />
                             <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-                        </NavDropdown>
+                        </NavDropdown> */}
                     </Nav>
                     {this.props.auth.isAuthenticated && (
                     <Form inline>

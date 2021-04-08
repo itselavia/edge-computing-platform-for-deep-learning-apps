@@ -10,6 +10,9 @@ import config from '../../config/app-config'
 Axios.defaults.baseURL = config.api_host;
 
 class AddUser extends Component {
+    constructor() {
+        super();
+    }
     onClose = e => {
         this.props.onClose && this.props.onClose(e);
       };
@@ -24,6 +27,8 @@ class AddUser extends Component {
             if(response.status === 201) {
                 alert("User Added successfully");
                 this.onClose();
+                //this.props.history.push("/dashboard");
+        
             }
        })
     }
