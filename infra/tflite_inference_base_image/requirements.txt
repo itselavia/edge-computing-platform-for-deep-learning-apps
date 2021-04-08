@@ -2,5 +2,4 @@ tensorflow==2.4.0
 gsutil==4.59
 numpy==1.19.5
 requests
-shutil
-cv2
+opencv-python
