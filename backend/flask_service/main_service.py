@@ -277,7 +277,8 @@ def uploadModel():
     source_file_name = request.files["modelfile"].filename
     request.files["modelfile"].save("models/" + source_file_name)
     storage_client = storage.Client()
-    bucket_name = 'edgecomputing-310003-tf-saved-models'
+    #bucket_name = 'edgecomputing-310003-tf-saved-models'
+    bucket_name = 'edge-platform-cmpe-295b-tf-saved-models'
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/modelfile/" + source_file_name
     blob = bucket.blob(destination_blob_name)
@@ -298,7 +299,8 @@ def uploadInference():
     source_file_name = request.files["inferencefile"].filename
     request.files["inferencefile"].save("inferencefiles/" + source_file_name)
     storage_client = storage.Client()
-    bucket_name = 'edgecomputing-310003-tf-saved-models'
+    #bucket_name = 'edgecomputing-310003-tf-saved-models'
+    bucket_name = 'edge-platform-cmpe-295b-tf-saved-models'
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/inferencefile/" + source_file_name
     blob = bucket.blob(destination_blob_name)
