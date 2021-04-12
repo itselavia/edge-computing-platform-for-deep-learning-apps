@@ -90,9 +90,9 @@ export const getProjectUsers = proj_info => dispatch => {
 
 export const getUserProjectsAndPods = userData => dispatch => {
   const projReq = axios.get("projects", { params: { email: userData.email } });
-  const podsReq = axios.get(config.pods_info_base+"getAllPods", { params: { email: userData.email } });
+  //const podsReq = axios.get(config.pods_info_base+"getAllPods", { params: { email: userData.email } });
 
-  axios.all([projReq, podsReq]).then(axios.spread((...response) => {
+  axios.all([projReq]).then(axios.spread((...response) => {
     const res1 = response[0];
     const res2 = response[1];
     console.log(res1)
@@ -105,12 +105,12 @@ export const getUserProjectsAndPods = userData => dispatch => {
       console.log("dispatching"+res1.data)
       dispatch(setUserProjects(res1.data));
     }
-    if(res2!=null) {
-      if(!!res2 && res2.data.length == 0) {
-        res2.data = [];
-      }
-      dispatch(setUserPods(res2.data));
-    }
+    // if(res2!=null) {
+    //   if(!!res2 && res2.data.length == 0) {
+    //     res2.data = [];
+    //   }
+    //   dispatch(setUserPods(res2.data));
+    // }
   })).catch(errors => {
     console.log(errors)
   })
