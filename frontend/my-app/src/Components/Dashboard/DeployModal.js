@@ -25,8 +25,8 @@ class DeployModal extends Component {
             deployment_name: this.state.deployment_name,
             custom_image: this.state.custom_image,
             num_replicas: parseInt(this.state.replicas),
-            memory_request: this.state.memory_request,
-            cpu_request: this.state.cpu_request,
+            memory_bytes: parseInt(this.state.memory_request),
+            cpu_millicores: parseInt(this.state.cpu_request),
             project_name: this.props.current_project.project_name, 
             labels: [],
             gpu_support: this.state.gpu_support
