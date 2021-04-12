@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-service
+  labels:
+    app: main-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-service
+  template:
+    metadata:
+      labels:
+        app: main-service
+    spec:
+      containers:
+        - name: main-service
+          image: vandittsjsu/flaskapp:akshay
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: main-service-env
+      imagePullSecrets:
+        - name: mainservicekey
+      nodeSelector:
+        type: worker
+      dnsPolicy: Default

@@ -12,14 +12,15 @@ import os
 
 app = Flask(__name__)
 
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_HOST'] = '34.94.126.181'
-app.config['MYSQL_DB'] = 'final_project_db'
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD',
+                                              'EdgePlatform#Pass_999')
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '34.94.126.181')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'final_project_db')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
-os.environ['MODEL_MANAGER_SERVICE_HOST'] = '35.235.110.141'
-os.environ['MODEL_MANAGER_SERVICE_PORT'] = '32000'
+# os.environ['MODEL_MANAGER_SERVICE_HOST'] = '35.235.110.141'
+# os.environ['MODEL_MANAGER_SERVICE_PORT'] = '32000'
 
 mysql = MySQL(app)
 
@@ -53,23 +54,23 @@ def newUser():
     userExists = cur.execute("SELECT name FROM user WHERE email_id=%s",
                              (email, ))
     if (userExists == 0):
-        cur.execute("INSERT INTO user VALUES (%s,%s,%s,'user')",
-                    (name, email, phone))
-        mysql.connection.commit()
-
         URL = "http://"
-        URL += str(os.environ['MODEL_MANAGER_SERVICE_HOST'])
+        URL += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', ''))
         URL += ":"
-        URL += str(os.environ['MODEL_MANAGER_SERVICE_PORT'])
+        URL += str(os.environ.get('MODEL_MANAGER_SERVICE_PORT', '32000'))
         URL += "/createUser"
         print(URL)
 
         PARAMS = {'email': email}
-
-        r = requests.post(url=URL, params=PARAMS)
-        print(r.status_code)
+        try:
+            r = requests.post(url=URL, params=PARAMS)
+        except requests.exceptions.RequestException as e:
+            return "Could not connect to the model manager", 401
 
         if r.status_code == 200:
+            cur.execute("INSERT INTO user VALUES (%s,%s,%s,'user')",
+                        (name, email, phone))
+            mysql.connection.commit()
             return "Created", 201
         else:
             return "Could not create user on the model manager", 401
@@ -167,7 +168,6 @@ def listProjects():
         temp["project_desc"] = row['project_desc']
         temp["owner_email"] = row['owner_email']
         project_list.append(temp)
-    print("project list :" + str(project_list))
     return json.dumps(project_list), 200
 
 
@@ -278,7 +278,8 @@ def uploadModel():
     request.files["modelfile"].save("models/" + source_file_name)
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
-    bucket_name = os.environ.get('TF_BUCKET_NAME', 'edge-platform-cmpe-295b-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME',
+                                 'edge-platform-cmpe-295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/modelfile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/modelfile/")
@@ -286,7 +287,8 @@ def uploadModel():
         blob.delete()
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/" + source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name,destination_blob_name))
+    print("File {} uploaded to {}.".format(source_file_name,
+                                           destination_blob_name))
     os.remove("models/" + source_file_name)
     time.sleep(5)
     return "Model uploaded", 201
@@ -302,7 +304,8 @@ def uploadInference():
     request.files["inferencefile"].save("inferencefiles/" + source_file_name)
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
-    bucket_name = os.environ.get('TF_BUCKET_NAME', 'edge-platform-cmpe-295b-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME',
+                                 'edge-platform-cmpe-295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/inferencefile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/inferencefile/")
@@ -310,7 +313,8 @@ def uploadInference():
         blob.delete()
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("inferencefiles/" + source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name,destination_blob_name))
+    print("File {} uploaded to {}.".format(source_file_name,
+                                           destination_blob_name))
     os.remove("inferencefiles/" + source_file_name)
     time.sleep(5)
     return "Inference uploaded", 201
