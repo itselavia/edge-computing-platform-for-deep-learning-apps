@@ -277,17 +277,19 @@ def uploadModel():
     source_file_name = request.files["modelfile"].filename
     request.files["modelfile"].save("models/" + source_file_name)
     storage_client = storage.Client()
-    #bucket_name = 'edgecomputing-310003-tf-saved-models'
-    bucket_name = 'edge-platform-cmpe-295b-tf-saved-models'
+    #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME', 'edge-platform-cmpe-295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/modelfile/" + source_file_name
+    blobs = bucket.list_blobs(prefix=projectname + "/modelfile/")
+    for blob in blobs:
+        blob.delete()
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("models/" + source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name,
-                                           destination_blob_name))
-    print(request.form)
+    print("File {} uploaded to {}.".format(source_file_name,destination_blob_name))
+    os.remove("models/" + source_file_name)
     time.sleep(5)
-    return "uploadModel", 201
+    return "Model uploaded", 201
 
 
 @app.route("/project/uploadInference", methods=['POST'])
@@ -299,17 +301,19 @@ def uploadInference():
     source_file_name = request.files["inferencefile"].filename
     request.files["inferencefile"].save("inferencefiles/" + source_file_name)
     storage_client = storage.Client()
-    #bucket_name = 'edgecomputing-310003-tf-saved-models'
-    bucket_name = 'edge-platform-cmpe-295b-tf-saved-models'
+    #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME', 'edge-platform-cmpe-295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/inferencefile/" + source_file_name
+    blobs = bucket.list_blobs(prefix=projectname + "/inferencefile/")
+    for blob in blobs:
+        blob.delete()
     blob = bucket.blob(destination_blob_name)
     blob.upload_from_filename("inferencefiles/" + source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name,
-                                           destination_blob_name))
-    print(request.form)
+    print("File {} uploaded to {}.".format(source_file_name,destination_blob_name))
+    os.remove("inferencefiles/" + source_file_name)
     time.sleep(5)
-    return "uploadModel", 201
+    return "Inference uploaded", 201
 
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
