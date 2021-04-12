@@ -21,3 +21,7 @@ output "database_ip" {
 output "credentials_location" {
   value = var.credentials_file_location
 }
+
+output "control_plane_address" {
+  value = module.kubernetes.control_plane_address
+}

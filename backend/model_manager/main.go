@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,13 +12,18 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	appsv1 "k8s.io/api/apps/v1"
 	apiv1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/rbac/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
 // Pair holds key value pairs
@@ -34,6 +40,8 @@ type DeployModelInput struct {
 	DeploymentName string `json:"deployment_name"`
 	CustomImage    string `json:"custom_image"`
 	NumReplicas    int32  `json:"num_replicas"`
+	MemoryBytes    int32  `json:"memory_bytes"`
+	CPUMillicores  int32  `json:"cpu_millicores"`
 	ProjectName    string `json:"project_name"`
 	GPUSupport     bool   `json:"gpu_support"`
 	NodeName       string `json:"node_name"`
@@ -230,6 +238,12 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 									Value: input.ProjectName,
 								},
 							},
+							Resources: apiv1.ResourceRequirements{
+								Requests: map[apiv1.ResourceName]resource.Quantity{
+									apiv1.ResourceCPU:    *resource.NewMilliQuantity(int64(input.CPUMillicores), resource.DecimalSI),
+									apiv1.ResourceMemory: *resource.NewQuantity(5*1024*1024, resource.BinarySI),
+								},
+							},
 							VolumeMounts: []apiv1.VolumeMount{
 								{
 									Name:      "cloudsql-oauth-credentials",
@@ -334,8 +348,147 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Unable to create service account for the user: " + email + " : " + err.Error() + "\n"))
 	}
 
+	role := &v1.Role{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      userNamespace + "-role",
+			Namespace: userNamespace,
+		},
+		Rules: []v1.PolicyRule{
+			{
+				Verbs: []string{
+					v1.VerbAll,
+				},
+				APIGroups: []string{
+					v1.APIGroupAll,
+				},
+				Resources: []string{
+					v1.ResourceAll,
+				},
+			},
+		},
+	}
+
+	_, err = clientset.RbacV1().Roles(userNamespace).Create(context.TODO(), role, metav1.CreateOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to create role for the user: " + email + " : " + err.Error() + "\n"))
+	}
+
+	roleBinding := &v1.RoleBinding{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      userNamespace + "-rolebinding",
+			Namespace: userNamespace,
+		},
+		Subjects: []v1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Namespace: userNamespace,
+				Name:      userNamespace,
+			},
+		},
+		RoleRef: v1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "Role",
+			Name:     userNamespace + "-role",
+		},
+	}
+
+	_, err = clientset.RbacV1().RoleBindings(userNamespace).Create(context.TODO(), roleBinding, metav1.CreateOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to create role binding for the user: " + email + " : " + err.Error() + "\n"))
+	}
+
+	userSA, err := clientset.CoreV1().ServiceAccounts(userNamespace).Get(context.TODO(), userNamespace, metav1.GetOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to retrieve user service account: " + email + " : " + err.Error() + "\n"))
+	}
+
+	userSASecret, err := clientset.CoreV1().Secrets(userNamespace).Get(context.TODO(), userSA.Secrets[0].Name, metav1.GetOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to retrieve user service account's associated Secret: " + email + " : " + err.Error() + "\n"))
+	}
+
+	clusters := make(map[string]*clientcmdapi.Cluster)
+	clusters["default-cluster"] = &clientcmdapi.Cluster{
+		Server:                   "https://" + os.Getenv("CONTROL_PLANE_ADDRESS") + ":6443",
+		CertificateAuthorityData: userSASecret.Data["ca.crt"],
+	}
+
+	contexts := make(map[string]*clientcmdapi.Context)
+	contexts["default-context"] = &clientcmdapi.Context{
+		Cluster:   "default-cluster",
+		Namespace: userNamespace,
+		AuthInfo:  "kubernetes-admin@" + userNamespace,
+	}
+
+	authinfos := make(map[string]*clientcmdapi.AuthInfo)
+	authinfos[userNamespace] = &clientcmdapi.AuthInfo{
+		Token: string(userSASecret.Data["token"]),
+	}
+
+	clientConfig := clientcmdapi.Config{
+		Kind:           "Config",
+		APIVersion:     "v1",
+		Clusters:       clusters,
+		Contexts:       contexts,
+		CurrentContext: "default-context",
+		AuthInfos:      authinfos,
+	}
+
+	clientcmd.WriteToFile(clientConfig, "/tmp/"+userNamespace+".kubeconfig")
+
+	err = uploadKubeconfigToGCP(email, "/tmp/"+userNamespace+".kubeconfig")
+	if err != nil {
+		w.Write([]byte("Unable to upload user's Kubeconfig to GCP: " + email + " : " + err.Error() + "\n"))
+	}
+
 	w.Write([]byte("Created Namespace, Service Account successfully: " + result.GetObjectMeta().GetName() + "\n"))
 
+}
+
+type ClientUploader struct {
+	cl         *storage.Client
+	projectID  string
+	bucketName string
+	uploadPath string
+}
+
+var uploader *ClientUploader
+
+func uploadKubeconfigToGCP(email string, localPath string) error {
+	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/etc/credentials/cloudsql-oauth-credentials.json")
+	client, err := storage.NewClient(context.Background())
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
+	defer cancel()
+
+	projectID := os.Getenv("PROJECT_ID")
+	bucketName := os.Getenv("TFLITE_BUCKET")[strings.LastIndex(os.Getenv("TFLITE_BUCKET"), "/")+1:]
+
+	uploader = &ClientUploader{
+		cl:         client,
+		bucketName: bucketName,
+		projectID:  projectID,
+		uploadPath: email + "/",
+	}
+
+	wc := uploader.cl.Bucket(uploader.bucketName).Object(uploader.uploadPath + "config").NewWriter(ctx)
+
+	reader, err := os.Open(localPath)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(wc, reader); err != nil {
+		return err
+	}
+	if err := wc.Close(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getKubeClientSet() (*kubernetes.Clientset, error) {
@@ -358,6 +511,8 @@ func getKubeClientSet() (*kubernetes.Clientset, error) {
 func getClusterConfig() (*rest.Config, error) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
+
+	rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}

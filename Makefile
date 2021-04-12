@@ -22,6 +22,7 @@ deploy-services:
 	$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
 	$(eval PROJECT_ID := $(shell terraform -chdir=infra/terraform output project_id))
 	$(eval FUNCTION_NAME := $(shell terraform -chdir=infra/terraform output function_name))
+	$(eval CONTROL_PLANE_ADDRESS := $(shell terraform -chdir=infra/terraform output control_plane_address))
 	$(eval TFLITE_BUCKET := $(shell terraform -chdir=infra/terraform output tf_saved_models_bucket))
 	$(eval KUBECONFIG := infra/terraform/modules/kubernetes/config)
 	$(eval GCP_CREDENTIALS_FILE := $(shell terraform -chdir=infra/terraform output credentials_location))
@@ -34,7 +35,7 @@ deploy-services:
         	done;
 
 	kubectl create secret generic cloudsql-oauth-credentials --from-file=creds=${GCP_CREDENTIALS_FILE}
-	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
+	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=CONTROL_PLANE_ADDRESS=${CONTROL_PLANE_ADDRESS} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
 	kubectl apply -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}
 
 	gcloud config set project ${PROJECT_ID}

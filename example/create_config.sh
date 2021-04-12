@@ -1,6 +1,6 @@
 #!/bin/bash
 # Update these to match your environment
-NEW_USER="cmpe295bedge"
+NEW_USER="walmart-store"
 SERVICE_ACCOUNT_NAME=$NEW_USER
 ORIGINAL_CONFIG="/Users/akshay/edge-computing-platform-for-deep-learning-apps/infra/terraform/modules/kubernetes/config"
 CONTEXT=$(kubectl config current-context --kubeconfig ${ORIGINAL_CONFIG})
@@ -8,8 +8,6 @@ NAMESPACE=$NEW_USER
 
 NEW_CONTEXT=$NEW_USER
 KUBECONFIG_FILE="kubeconfig-sa-${NEW_USER}"
-
-kubectl --kubeconfig ${ORIGINAL_CONFIG} create sa $NEW_USER -n $NEW_USER
 
 SECRET_NAME=$(kubectl get serviceaccount ${SERVICE_ACCOUNT_NAME} \
   --context ${CONTEXT} \

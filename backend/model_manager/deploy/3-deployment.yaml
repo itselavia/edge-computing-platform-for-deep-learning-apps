@@ -22,6 +22,17 @@ spec:
         envFrom:
         - configMapRef:
             name: model-manager-env
+        volumeMounts:
+        - name: cloudsql-volume
+          mountPath: "/etc/credentials"
+          readOnly: true
+      volumes:
+      - name: cloudsql-volume
+        secret:
+          secretName: cloudsql-oauth-credentials
+          items:
+          - key: creds
+            path: cloudsql-oauth-credentials.json
       nodeSelector:
         type: worker
       dnsPolicy: Default
