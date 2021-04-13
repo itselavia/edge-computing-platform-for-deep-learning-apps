@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-frontend
+  labels:
+    app: edge-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edge-frontend
+  template:
+    metadata:
+      labels:
+        app: edge-frontend
+    spec:
+      containers:
+      - name: edge-frontend
+        image: aishwaryadeep07/final:dev
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: edge-frontend-env
+      nodeSelector:
+        type: worker
+      dnsPolicy: Default
