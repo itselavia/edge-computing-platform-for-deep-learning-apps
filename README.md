@@ -2,7 +2,7 @@
 This is the code repository for CMPE295 Masters Project. Part of the curriculum for Masters in Software Engineering at San Jose State University.
 
 ### Architecture Diagram
-![Architecture Diagram](img/architecture_diagram.png)
+![Architecture Diagram](img/architecture.png)
 
 ### Prerequisites:
 - Enable the GCP APIs: Cloud Functions, Cloud Build, Storage, Virtual Machine, VPC, IAM, Cloud SQL
@@ -57,7 +57,7 @@ export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
 ```mysql --host=`terraform -chdir=infra/terraform output database_ip` --user=USERNAME --password```
 
 ### User Workflow
-![User Workflow](img/edge-platform-user-workflow-model-deploy.png)
+![User Workflow](img/user_workflow.png)
 
 #### Notes:
 - GCP doesn't handle renaming resources well enough. For example, if you're deleting and recreating a service account, it's better to give a new name to the new service account.
