@@ -421,7 +421,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	authinfos := make(map[string]*clientcmdapi.AuthInfo)
-	authinfos[userNamespace] = &clientcmdapi.AuthInfo{
+	authinfos["kubernetes-admin@"+userNamespace] = &clientcmdapi.AuthInfo{
 		Token: string(userSASecret.Data["token"]),
 	}
 
@@ -456,11 +456,11 @@ var uploader *ClientUploader
 
 func uploadKubeconfigToGCP(email string, localPath string) error {
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/etc/credentials/cloudsql-oauth-credentials.json")
-	client, err := storage.NewClient(context.Background())
+	client, err := storage.NewClient(context.TODO())
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx := context.TODO()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
@@ -530,5 +530,5 @@ func main() {
 	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST", "OPTIONS")
 	r.HandleFunc("/getAllPods", GetAllPodsHandler).Methods("GET", "OPTIONS")
 
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"http://localhost:3001"}), handlers.AllowCredentials())(r)))
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"http://34.94.222.49:30001"}), handlers.AllowCredentials())(r)))
 }

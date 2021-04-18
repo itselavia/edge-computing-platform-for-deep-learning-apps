@@ -17,6 +17,7 @@ spec:
       containers:
         - name: main-service
           image: vandittsjsu/flaskapp:akshay
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           envFrom:
