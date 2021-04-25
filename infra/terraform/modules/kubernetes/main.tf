@@ -34,7 +34,7 @@ data "template_file" "worker_init" {
 resource "google_compute_instance" "k8s_controlplane" {
   name         = "k8s-controlplane"
   machine_type = "e2-small"
-  zone         = var.zone
+  zone         = var.zone[0]
 
   boot_disk {
     initialize_params {
@@ -46,7 +46,7 @@ resource "google_compute_instance" "k8s_controlplane" {
 
   network_interface {
     network    = var.vpc_name
-    subnetwork = var.subnetwork_name
+    subnetwork = var.subnetwork_name[0]
     access_config {
 
     }
@@ -67,7 +67,7 @@ resource "google_compute_instance" "k8s_workers" {
   count        = var.k8s_worker_node_count
   name         = "k8s-worker-${count.index}"
   machine_type = "e2-small"
-  zone         = var.zone
+  zone         = var.zone[1]
 
   boot_disk {
     initialize_params {
@@ -79,7 +79,7 @@ resource "google_compute_instance" "k8s_workers" {
 
   network_interface {
     network    = var.vpc_name
-    subnetwork = var.subnetwork_name
+    subnetwork = var.subnetwork_name[1]
     access_config {
 
     }

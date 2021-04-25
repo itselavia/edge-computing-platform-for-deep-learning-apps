@@ -1,11 +1,13 @@
 cluster-init:
-	terraform -chdir=infra/terraform init
+	terraform -chdir=infra/terraform init -upgrade
 
 cluster-plan: cluster-init
 	terraform -chdir=infra/terraform plan
 
 cluster-deploy: cluster-init
 	terraform -chdir=infra/terraform apply --auto-approve
+	$(eval KUBECONFIG := infra/terraform/modules/kubernetes/config)
+	kubectl get nodes  --kubeconfig=${KUBECONFIG}
 
 cluster-destroy: 
 	terraform -chdir=infra/terraform destroy --auto-approve
@@ -29,6 +31,10 @@ deploy-services:
 	
 	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep worker | awk '{print $$1}' | while read line ; do \
             kubectl label node $$line type=worker --kubeconfig=${KUBECONFIG} --overwrite; \
+        	done;
+
+	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep gpu | awk '{print $$1}' | while read line ; do \
+            kubectl label node $$line type=gpu-worker --kubeconfig=${KUBECONFIG} --overwrite; \
         	done;
 
 	kubectl get nodes  --kubeconfig=${KUBECONFIG} | grep edge | awk '{print $$1}' | while read line ; do \

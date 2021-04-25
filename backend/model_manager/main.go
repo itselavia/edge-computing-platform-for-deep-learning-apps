@@ -199,6 +199,13 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 
 	deploymentsClient := clientset.AppsV1().Deployments(userNamespace)
 
+	label := ""
+	if input.GPUSupport == true {
+		label = "gpu-worker"
+	} else {
+		label = "worker"
+	}
+
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      input.DeploymentName,
@@ -255,7 +262,7 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 						},
 					},
 					NodeSelector: map[string]string{
-						"type": "worker",
+						"type": label,
 					},
 					DNSPolicy: apiv1.DNSDefault,
 					Volumes: []apiv1.Volume{

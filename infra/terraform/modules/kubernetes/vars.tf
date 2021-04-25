@@ -3,11 +3,11 @@ variable "vpc_name" {
 }
 
 variable "subnetwork_name" {
-  type = string
+  type = list(string)
 }
 
 variable "zone" {
-  type = string
+  type = list(string)
 }
 
 variable "k8s_worker_node_count" {
