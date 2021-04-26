@@ -7,14 +7,21 @@ resource "google_compute_network" "vpc_network" {
 resource "google_compute_subnetwork" "subnetwork_1" {
   name          = "subnetwork-1"
   ip_cidr_range = "10.0.0.0/24"
-  region        = var.region
+  region        = var.region[0]
   network       = google_compute_network.vpc_network.id
 }
 
 resource "google_compute_subnetwork" "subnetwork_2" {
   name          = "subnetwork-2"
   ip_cidr_range = "10.0.1.0/24"
-  region        = var.region
+  region        = var.region[1]
+  network       = google_compute_network.vpc_network.id
+}
+
+resource "google_compute_subnetwork" "subnetwork_3" {
+  name          = "subnetwork-3"
+  ip_cidr_range = "10.0.2.0/24"
+  region        = var.region[2]
   network       = google_compute_network.vpc_network.id
 }
 
