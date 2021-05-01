@@ -5,3 +5,7 @@ output "subnetwork_1_name" {
 output "subnetwork_2_name" {
   value = google_compute_subnetwork.subnetwork_2.name
 }
+
+output "subnetwork_3_name" {
+  value = google_compute_subnetwork.subnetwork_3.name
+}

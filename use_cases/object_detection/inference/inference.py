@@ -12,6 +12,45 @@ import requests
 import shutil
 import argparse
 import numpy as np
+import os
+
+from flask import Flask, request
+from flask import jsonify, json
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return "Home"
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin',
+                         'http://localhost:3001')
+    response.headers.add('Access-Control-Allow-Headers',
+                         'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                         'GET,PUT,POST,DELETE,OPTIONS,HEAD')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
+
+@app.route("/getResults")
+def getResults():
+    image_url = request.args.get('image_url')
+    objects = inference(image_url)
+    return json.dumps(objects), 200
+
+
+@app.route("/checkGPUsupport")
+def gpu_support_check():
+    gups = tf.config.list_physical_devices('GPU')
+    if (len(gups) > 0):
+        return "True" , 200
+    else:
+        return "False" , 200
+
+
+
 
 
 LABELS_DICT = {-1: '???',
@@ -148,12 +187,17 @@ def inference(url):
     detection_scores = interpreter.get_tensor(output_details[2]['index'])
     num_boxes = interpreter.get_tensor(output_details[3]['index'])
     object_number=1
+    objects = []
     print("Finding objects in image....")
     for i in range(int(num_boxes[0])):
         if detection_scores[0, i] > .5:
             class_id = detection_classes[0, i]
-            print("Object "+str(object_number) + " is detected as "+LABELS_DICT.get(class_id))
+            object = LABELS_DICT.get(class_id)
+            print("Object "+str(object_number) + " is detected as "+object)
+            objects.append(object)
             object_number = object_number+1
+    os.remove(filename)
+    return objects
 
 
 def unit_test():

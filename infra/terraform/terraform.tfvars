@@ -1,6 +1,6 @@
-region                    = "us-west2"
-vpc_name                  = "masters-295a"
-zone                      = "us-west2-a"
+region                    = ["us-central1", "us-west1", "us-east4"]
+vpc_name                  = "masters-295b"
+zone                      = ["us-central1-f","us-west1-a", "us-east4-b"]
 project_name              = "edge-platform-cmpe-295b"
 k8s_worker_node_count     = 1
 edge_node_count           = 1

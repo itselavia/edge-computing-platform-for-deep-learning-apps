@@ -3,5 +3,5 @@ variable "vpc_name" {
 }
 
 variable "region" {
-  type = string
+  type = list(string)
 }

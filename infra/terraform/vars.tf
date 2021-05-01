@@ -1,5 +1,5 @@
 variable "region" {
-  type = string
+  type = list(string)
 }
 
 variable "vpc_name" {
@@ -7,7 +7,7 @@ variable "vpc_name" {
 }
 
 variable "zone" {
-  type = string
+  type = list(string)
 }
 
 variable "project_name" {
