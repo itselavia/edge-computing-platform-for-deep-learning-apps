@@ -8,14 +8,13 @@ from flask import jsonify, json
 import os
 import time
 import requests
-import os
 
 app = Flask(__name__)
 
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'platform')
 app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD',
                                               'EdgePlatform#Pass_999')
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '34.94.126.181')
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '35.236.202.116')
 app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'final_project_db')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -32,8 +31,10 @@ def index():
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin',
-                         'http://localhost:3001')
+    addr = "http://"
+    addr += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', ''))
+    addr += ":30001"
+    response.headers.add('Access-Control-Allow-Origin', addr)
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods',
@@ -45,7 +46,7 @@ def after_request(response):
 @app.route("/newUser", methods=['POST'])
 def newUser():
     reqData = request.json
-    print(reqData)
+    # print(reqData)
     name = reqData['name']
     email = reqData['email']
     phone = reqData['phone']
@@ -56,8 +57,8 @@ def newUser():
     if (userExists == 0):
         URL = "http://"
         URL += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', ''))
-        URL += ":"
-        URL += str(os.environ.get('MODEL_MANAGER_SERVICE_PORT', '32000'))
+        URL += ":32000"
+        # URL += str(os.environ.get('MODEL_MANAGER_PORT', '32000'))
         URL += "/createUser"
         print(URL)
 
