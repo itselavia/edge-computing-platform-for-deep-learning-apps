@@ -5,7 +5,7 @@ use final_project_db;
 
 CREATE TABLE IF NOT EXISTS user
 (name  varchar(100), 
-email  varchar(100) primary key, 
+email_id  varchar(100) primary key, 
 phone long, 
 role  varchar(100));
 
