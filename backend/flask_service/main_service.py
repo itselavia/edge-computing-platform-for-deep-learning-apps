@@ -323,7 +323,7 @@ def uploadInference():
 @app.route("/user/getConfig")
 def getConfig():
     username = request.form["username"]
-    gcp_config_file_path = '/'+username+/'config'
+    gcp_config_file_path = '/'+username+'/config'
     config_dir_name = '/config_files/'+username
     destination_file_name = config_dir_name+'/config'
     if not os.path.exists(config_dir_name):
