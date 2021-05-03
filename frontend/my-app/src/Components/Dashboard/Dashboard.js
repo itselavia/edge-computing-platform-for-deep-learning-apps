@@ -251,7 +251,7 @@ class Dashboard extends Component {
                     </Modal.Footer>
                 </Modal>
             <br/>
-                {this.state.deploy_button_text === "Create Deployment" &&
+                {this.state.deploy_button_text === "Edit Deployment" &&
                     (<div>
                     <Form>
                         <div>
