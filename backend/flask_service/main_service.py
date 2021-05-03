@@ -280,7 +280,7 @@ def uploadModel():
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
     bucket_name = os.environ.get('TF_BUCKET_NAME',
-                                 'edge-platform-cmpe-295b-tf-saved-models')
+                                 'sjsu295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/modelfile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/modelfile/")
@@ -306,7 +306,7 @@ def uploadInference():
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
     bucket_name = os.environ.get('TF_BUCKET_NAME',
-                                 'edge-platform-cmpe-295b-tf-saved-models')
+                                 'sjsu295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/inferencefile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/inferencefile/")
@@ -330,7 +330,7 @@ def getConfig():
         os.mkdirs(config_dir_name)
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
-    bucket_name = os.environ.get('TF_BUCKET_NAME','edge-platform-cmpe-295b-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME','sjsu295b-tf-saved-models')
     blob = bucket.blob()
     blob.download_to_filename(destination_file_name)
     try:
