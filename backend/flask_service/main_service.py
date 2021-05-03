@@ -320,6 +320,24 @@ def uploadInference():
     time.sleep(5)
     return "Inference uploaded", 201
 
+@app.route("/user/getConfig")
+def getConfig():
+    username = request.form["username"]
+    gcp_config_file_path = '/'+username+'/config'
+    config_dir_name = '/config_files/'+username
+    destination_file_name = config_dir_name+'/config'
+    if not os.path.exists(config_dir_name):
+        os.mkdirs(config_dir_name)
+    storage_client = storage.Client()
+    #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME','edge-platform-cmpe-295b-tf-saved-models')
+    blob = bucket.blob()
+    blob.download_to_filename(destination_file_name)
+    try:
+		return send_file(destination_file_name, attachment_filename=destination_file_name)
+	except Exception as e:
+		return str(e)
+    return "convertModel", 201
 
 @app.route("/project/<id>/convertModel", methods=['POST'])
 def convertModel(id):
