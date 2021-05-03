@@ -10,7 +10,10 @@ import {uploadFile, getProjectUsers} from "../../redux/actions/authActions"
 import Loader from "react-loader-spinner";
 import AddUser from './AddUser';
 import DeployModal from './DeployModal';
+import axios from 'axios';
+import config from '../../config/app-config'
 
+// Axios.defaults.baseURL = config.api_host;
 class Dashboard extends Component {
     constructor() {
         super();
@@ -123,7 +126,19 @@ class Dashboard extends Component {
     }
 
     
-
+    handleInference = ()=> {
+        //http://127.0.0.1:5001
+        axios.get(config.inference_host+"getResults", { params: { image_url: this.state.image_url } })
+        .then((response)=>{
+            this.setState({
+                objectResult:response.data[0]
+            })
+            console.log(response)
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+    }
 
     handleModalClose = ()=>{
         this.setState({showFileUpload: false})
@@ -148,6 +163,7 @@ class Dashboard extends Component {
     }
 
     render() {
+        let object_image = <div><img src={this.state.image_url} height={200} width={200}/> <br/></div>
         if(this.props.auth.loading) 
             return (
                 <Container fluid ="lg">
@@ -234,7 +250,37 @@ class Dashboard extends Component {
                     <Button variant="primary" onClick={this.deploymentModal}>Proceed</Button>
                     </Modal.Footer>
                 </Modal>
-
+            <br/>
+                {this.state.deploy_button_text === "Create Deployment" &&
+                    (<div>
+                    <Form>
+                        <div>
+                            <Form.Row>
+                                <Form.Group as={Col} controlId="image_url">
+                                            <Form.Label>
+                                            <b>Image URL</b>
+                                            </Form.Label>
+                                            
+                                        
+                                        <Form.Control name="image_url"
+                                                type="text"
+                                                onChange={this.onChange}
+                                                placeholder="Enter the URL of image you want to detect"
+                                                
+                                            required />
+                                </Form.Group>     
+                            </Form.Row>
+                            <br/>
+                       </div>
+                       {this.state.image_url!=null && this.state.image_url!='' && object_image}
+                       
+                </Form>
+                <br/>
+                <Button variant="primary" onClick={this.handleInference}>Object Infer</Button>
+                <h1>&nbsp;&nbsp;&nbsp;&nbsp; {this.state.objectResult}</h1>
+                </div>    
+                    )
+        }
             </Container>
         )
     }

@@ -51,7 +51,7 @@ export const loginUser = userData => dispatch => {
       console.log(err)
       dispatch({
         type: GET_ERRORS,
-        payload: err.response.data
+        payload: {hasError:true}
       })
     }
     );
@@ -120,8 +120,18 @@ export const getUserProjectsAndPods = userData => dispatch => {
 export const createProjectAction = projData => dispatch => {
   axios.post("newProject", projData)
     .then(res => {
-
-      console.log(res.data)
+      // const data = { email: projData.user_email }
+      const projReq = axios.get("projects", { params: { email: projData.user_email } }).
+      then(res1=>{
+        if (res1!=null) {
+          if(!!res1 && res1.data.length == 0) {
+            console.log("size == 0")
+            res1.data = [];
+          }
+          console.log("dispatching"+res1.data)
+          dispatch(setUserProjects(res1.data));
+        }
+      })
 
     })
 }

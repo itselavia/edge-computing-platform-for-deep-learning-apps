@@ -32,8 +32,8 @@ def index():
 @app.after_request
 def after_request(response):
     addr = "http://"
-    addr += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', ''))
-    addr += ":30001"
+    addr += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', 'localhost'))
+    addr += ":3001"
     response.headers.add('Access-Control-Allow-Origin', addr)
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
@@ -161,7 +161,7 @@ def listProjects():
     sql = sql % in_p
     cur.execute(sql, project_IDs)
     project_list = []
-
+    
     for row in cur.fetchall():
         temp = {}
         temp["project_id"] = row['project_id']

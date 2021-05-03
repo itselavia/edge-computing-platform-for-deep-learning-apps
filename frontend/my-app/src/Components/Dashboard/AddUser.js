@@ -30,6 +30,8 @@ class AddUser extends Component {
                 //this.props.history.push("/dashboard");
         
             }
+       }).catch(err=>{
+           
        })
     }
 

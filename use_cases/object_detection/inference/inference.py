@@ -82,6 +82,7 @@ def gpu_support_check():
     if (len(gups) > 0):
         return "True", 200
     else:
+<<<<<<< Updated upstream
         return "False", 200
 
 
@@ -188,6 +189,109 @@ def allowed_file(filename):
 
 
 def download_image(url: str):
+=======
+        return "False" , 200
+
+
+
+
+
+LABELS_DICT = {-1: '???',
+ 0: 'person',
+ 1: 'bicycle',
+ 2: 'car',
+ 3: 'motorcycle',
+ 4: 'airplane',
+ 5: 'bus',
+ 6: 'train',
+ 7: 'truck',
+ 8: 'boat',
+ 9: 'traffic',
+ 10: 'fire',
+ 11: '???',
+ 12: 'stop',
+ 13: 'parking',
+ 14: 'bench',
+ 15: 'bird',
+ 16: 'cat',
+ 17: 'dog',
+ 18: 'horse',
+ 19: 'sheep',
+ 20: 'cow',
+ 21: 'elephant',
+ 22: 'bear',
+ 23: 'zebra',
+ 24: 'giraffe',
+ 25: '???',
+ 26: 'backpack',
+ 27: 'umbrella',
+ 28: '???',
+ 29: '???',
+ 30: 'handbag',
+ 31: 'tie',
+ 32: 'suitcase',
+ 33: 'frisbee',
+ 34: 'skis',
+ 35: 'snowboard',
+ 36: 'sports',
+ 37: 'kite',
+ 38: 'baseball',
+ 39: 'baseball',
+ 40: 'skateboard',
+ 41: 'surfboard',
+ 42: 'tennis',
+ 43: 'bottle',
+ 44: '???',
+ 45: 'wine',
+ 46: 'cup',
+ 47: 'fork',
+ 48: 'knife',
+ 49: 'spoon',
+ 50: 'bowl',
+ 51: 'banana',
+ 52: 'apple',
+ 53: 'sandwich',
+ 54: 'orange',
+ 55: 'broccoli',
+ 56: 'carrot',
+ 57: 'hot',
+ 58: 'pizza',
+ 59: 'donut',
+ 60: 'cake',
+ 61: 'chair',
+ 62: 'couch',
+ 63: 'potted',
+ 64: 'bed',
+ 65: '???',
+ 66: 'dining',
+ 67: '???',
+ 68: '???',
+ 69: 'toilet',
+ 70: '???',
+ 71: 'tv',
+ 72: 'laptop',
+ 73: 'mouse',
+ 74: 'remote',
+ 75: 'keyboard',
+ 76: 'cell',
+ 77: 'microwave',
+ 78: 'oven',
+ 79: 'toaster',
+ 80: 'sink',
+ 81: 'refrigerator',
+ 82: '???',
+ 83: 'book',
+ 84: 'clock',
+ 85: 'vase',
+ 86: 'scissors',
+ 87: 'teddy',
+ 88: 'hair',
+ 89: 'toothbrush'}
+
+TFLITE_FILE_PATH ="../model.tflite"
+
+def download_image(url:str):
+>>>>>>> Stashed changes
     filename = url.split("/")[-1]
     # Open the url image, set stream to True, this will return the stream content.
     r = requests.get(url, stream=True)

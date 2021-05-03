@@ -25,7 +25,7 @@ class DeployModal extends Component {
             deployment_name: this.state.deployment_name,
             custom_image: this.state.custom_image,
             num_replicas: parseInt(this.state.replicas),
-            memory_bytes: parseInt(this.state.memory_request),
+            memory_megabytes: parseInt(this.state.memory_request),
             cpu_millicores: parseInt(this.state.cpu_request),
             project_name: this.props.current_project.project_name, 
             labels: [],
@@ -38,13 +38,13 @@ class DeployModal extends Component {
         })
         console.log(deployData)
         const email = this.props.current_project.owner_email
-       Axios.post(config.pods_info_base+"deployModel", deployData, {params : {email:email}}).then((response)=>{
-            console.log(response);
-            if(response.status === 200) {
-                alert("Model Deployment scheduled successfully");
-                this.onClose();
-            }
-       })
+        Axios.post(config.pods_info_base+"deployModel", deployData, {params : {email:email}}).then((response)=>{
+                console.log(response);
+                if(response.status === 200) {
+                    alert("Model Deployment scheduled successfully");
+                    this.onClose();
+                }
+        })
     }
 
     onChange = e => {
