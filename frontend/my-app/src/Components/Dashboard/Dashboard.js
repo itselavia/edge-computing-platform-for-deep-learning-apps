@@ -128,6 +128,7 @@ class Dashboard extends Component {
     
     handleInference = ()=> {
         //http://127.0.0.1:5001
+        //console.log("The inference host url is"+config.inference_host)
         axios.get(config.inference_host+"getResults", { params: { image_url: this.state.image_url } })
         .then((response)=>{
             this.setState({

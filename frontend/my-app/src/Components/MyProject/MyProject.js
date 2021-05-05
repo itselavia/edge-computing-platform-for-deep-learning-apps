@@ -8,6 +8,7 @@ import DonutChart from 'react-donut-chart';
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { Col, Row ,Nav, Form} from 'react-bootstrap';
+import config from '../../config/app-config'
 import file from '../../kubeconfig-sa-cmpe295bedge.yaml'
 class MyProject extends Component {
     
@@ -161,7 +162,7 @@ class MyProject extends Component {
 
                    <Container>
                        <br/>
-                       <h4>Project Summary  <a href={file} download="kubeconfig-sa-cmpe295bedge.yaml">download config</a></h4>
+                       <h4>Project Summary  <a href={config.api_host+"user/getConfig?username="+this.props.auth.user.email} download="kubeconfig-sa-cmpe295bedge.yaml">download config</a></h4>
                        <br/>
                        <Row xs={1} md={2}>
                            <Col >

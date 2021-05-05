@@ -41,7 +41,9 @@ class DeployModal extends Component {
         Axios.post(config.pods_info_base+"deployModel", deployData, {params : {email:email}}).then((response)=>{
                 console.log(response);
                 if(response.status === 200) {
-                    alert("Model Deployment scheduled successfully");
+                    let arr = response.data.split(":")
+                    alert("Model deployment scheduled successfully!!!!");
+                    localStorage.setItem("port", arr[2].trim())
                     this.onClose();
                 }
         })
