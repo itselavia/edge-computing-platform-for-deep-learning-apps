@@ -77,3 +77,6 @@ Similar output should be shown. In our case NVIDIA Tesla K80 is detected
 +-----------------------------------------------------------------------------+
 ```
 
+## Use case and benchmarking 
+
+For bentching and use case purposes starter code is used from NIVIDIA repository [https://github.com/NVIDIA/TensorRT/tree/master/samples/python/uff_ssd](https://github.com/NVIDIA/TensorRT/tree/master/samples/python/uff_ssd)
