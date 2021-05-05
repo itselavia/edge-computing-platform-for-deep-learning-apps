@@ -416,6 +416,7 @@ def parse_commandline_arguments():
 
 if __name__ == '__main__':
     # Parse command line arguments
+    start_time = time.time()
     parsed = parse_commandline_arguments()
 
     # Check if inference should be skipped (if model inference
@@ -489,3 +490,4 @@ if __name__ == '__main__':
     # Close detection files, they are not needed anymore
     for key in detection_files:
         detection_files[key].close()
+    print("--- Total time taken for inference is  %s seconds ---" % (time.time() - start_time))
