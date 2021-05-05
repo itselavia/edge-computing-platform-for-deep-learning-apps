@@ -1,4 +1,4 @@
-# NVIDIA TensorRT
+# NVIDIA TensorRT setup on GPU VM
 
 TensorRT provides an SDK for high-performance deep learning inference. TensorRT helps in achieving high throughput and low latency for deep learning applications by providing deep learning inference optimizer and runtime.
 
