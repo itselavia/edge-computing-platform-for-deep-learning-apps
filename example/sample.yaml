@@ -1,9 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: sample-2
+  name: sample-4
 spec:
   containers:
   - image: nginx
-    name: sample
-  nodeName: k8s-worker-0
+    name: internet-check-2
+  nodeName: gpu
+  hostNetwork: true

@@ -6,3 +6,6 @@ output "converter_function_name" {
   value = google_cloudfunctions_function.converter_function.id
 }
 
+output "converter_function_region" {
+value = google_cloudfunctions_function.converter_function.region
+}

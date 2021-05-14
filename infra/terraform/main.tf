@@ -47,9 +47,10 @@ module "tflite_converter" {
   project_name  = var.project_name
   config_bucket = module.config_bucket.config_bucket_name
 }
-
+/*
 module "gpu_node" {
   source        = "./modules/gpu_node"
   controlplane_ip = module.kubernetes.controlplane_ip
   kubeadm_token = module.kubernetes.kubeadm_token
 }
+*/

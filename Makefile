@@ -21,7 +21,8 @@ test-tflite-model-deploy:
 	gsutil cp example/inference.py ${BUCKET_URL}/akshay.elavia@gmail.com/Sample_Project/
 
 deploy-services:
-	$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
+	#$(eval REGION := $(shell terraform -chdir=infra/terraform output function_region))
+	$(eval REGION := us-east4)
 	$(eval PROJECT_ID := $(shell terraform -chdir=infra/terraform output project_id))
 	$(eval FUNCTION_NAME := $(shell terraform -chdir=infra/terraform output function_name))
 	$(eval CONTROL_PLANE_ADDRESS := $(shell terraform -chdir=infra/terraform output control_plane_address))
@@ -41,20 +42,24 @@ deploy-services:
             kubectl label node $$line type=edge --kubeconfig=${KUBECONFIG} --overwrite; \
         	done;
 
+	helm repo add nvidia https://nvidia.github.io/gpu-operator --kubeconfig=${KUBECONFIG}
+	helm repo update --kubeconfig=${KUBECONFIG}
+	helm install --wait --generate-name nvidia/gpu-operator --kubeconfig=${KUBECONFIG}
+
+	$(eval WORKER_IP := $(shell gcloud compute instances list | grep worker | awk '{print $$5}' | head -n 1))
+
 	kubectl create secret generic cloudsql-oauth-credentials --from-file=creds=${GCP_CREDENTIALS_FILE}
 	kubectl create configmap model-manager-env --from-literal=CONVERTER_FUNCTION_REGION=${REGION} --from-literal=PROJECT_ID=${PROJECT_ID} --from-literal=CONVERTER_FUNCTION_NAME=${FUNCTION_NAME} --from-literal=CONTROL_PLANE_ADDRESS=${CONTROL_PLANE_ADDRESS} --from-literal=TFLITE_BUCKET=${TFLITE_BUCKET} --from-literal=WORKER_IP=${WORKER_IP} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/model_manager/deploy/configmap.yaml
 	kubectl apply -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}
 
 	gcloud config set project ${PROJECT_ID}
-	$(eval WORKER_IP := $(shell gcloud compute instances list | grep worker | awk '{print $$5}' | head -n 1))
 	echo "Model Manager IP Address: " ${WORKER_IP}:32000
-
 
 	kubectl create configmap edge-frontend-env --from-literal=CHOKIDAR_USEPOLLING=true --from-literal=REACT_APP_DOMAIN=${WORKER_IP} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > frontend/deploy/1-configmap.yaml
 	kubectl apply -f frontend/deploy
 
 	kubectl create secret generic mainservicekey --from-file=.dockerconfigjson=/Users/akshay/Desktop/docker_creds --type=kubernetes.io/dockerconfigjson --kubeconfig=${KUBECONFIG}
-	kubectl create configmap main-service-env --from-literal=MODEL_MANAGER_SERVICE_HOST=${WORKER_IP} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/flask_service/deploy/1-configmap.yaml
+	kubectl create configmap main-service-env --from-literal=MODEL_MANAGER_SERVICE_HOST=${WORKER_IP} --from-literal=TF_BUCKET_NAME=${TFLITE_BUCKET} --kubeconfig=${KUBECONFIG} --dry-run -o yaml > backend/flask_service/deploy/1-configmap.yaml
 	kubectl apply -f backend/flask_service/deploy
 delete-services:
 	kubectl delete -f backend/model_manager/deploy --kubeconfig=${KUBECONFIG}

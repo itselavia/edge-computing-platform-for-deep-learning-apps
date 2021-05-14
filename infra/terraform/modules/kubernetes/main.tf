@@ -33,12 +33,12 @@ data "template_file" "worker_init" {
 
 resource "google_compute_instance" "k8s_controlplane" {
   name         = "k8s-controlplane"
-  machine_type = "e2-small"
+  machine_type = "e2-standard-8"
   zone         = var.zone[0]
 
   boot_disk {
     initialize_params {
-      size  = "30"
+      size  = "50"
       type  = "pd-standard"
       image = data.google_compute_image.ubuntu.self_link
     }

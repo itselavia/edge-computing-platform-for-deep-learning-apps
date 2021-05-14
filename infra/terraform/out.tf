@@ -3,7 +3,7 @@ output "tf_saved_models_bucket" {
 }
 
 output "function_region" {
-  value = var.region
+  value = module.tflite_converter.converter_function_region
 }
 
 output "project_id" {

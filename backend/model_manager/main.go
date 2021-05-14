@@ -7,8 +7,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +22,7 @@ import (
 	v1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -244,6 +247,10 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 									Name:  "PROJECT_NAME",
 									Value: input.ProjectName,
 								},
+								{
+									Name:  "FRONT_END_ADDRESS",
+									Value: os.Getenv("WORKER_IP"),
+								},
 							},
 							Resources: apiv1.ResourceRequirements{
 								Requests: map[apiv1.ResourceName]resource.Quantity{
@@ -264,7 +271,6 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 					NodeSelector: map[string]string{
 						"type": label,
 					},
-					DNSPolicy: apiv1.DNSDefault,
 					Volumes: []apiv1.Volume{
 						{
 							Name: "cloudsql-oauth-credentials",
@@ -286,11 +292,50 @@ func DeployModelHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
+	if input.GPUSupport == true {
+		deployment.Spec.Template.Spec.HostNetwork = true
+		deployment.Spec.Template.Spec.DNSPolicy = apiv1.DNSDefault
+	} else {
+		deployment.Spec.Template.Spec.DNSPolicy = apiv1.DNSDefault
+	}
+
 	result, err := deploymentsClient.Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
 		w.Write([]byte("Unable to create Deployment: " + err.Error() + "\n"))
 	}
-	w.Write([]byte("Created Deployment successfully: " + result.GetObjectMeta().GetName() + "\n"))
+
+	dynamicPort := 32000 + rand.Intn(100)
+
+	servicesClient := clientset.CoreV1().Services(userNamespace)
+
+	service := &apiv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      input.DeploymentName + "-service",
+			Namespace: userNamespace,
+		},
+		Spec: apiv1.ServiceSpec{
+			Type: apiv1.ServiceTypeNodePort,
+			Selector: map[string]string{
+				"app":          "edge",
+				"project_name": input.ProjectName,
+			},
+			Ports: []apiv1.ServicePort{
+				{
+					Protocol:   apiv1.ProtocolTCP,
+					TargetPort: intstr.FromInt(5001),
+					Port:       int32(5001),
+					NodePort:   int32(dynamicPort),
+				},
+			},
+		},
+	}
+
+	_, err = servicesClient.Create(context.TODO(), service, metav1.CreateOptions{})
+	if err != nil {
+		w.Write([]byte("Unable to create Deployment: " + err.Error() + "\n"))
+	}
+
+	w.Write([]byte("Created Deployment successfully: " + result.GetObjectMeta().GetName() + " with port: " + strconv.Itoa(dynamicPort) + "\n"))
 }
 
 //CreateUserHandler for /createUser path. It creates namespaces and service accounts for new users
@@ -537,5 +582,5 @@ func main() {
 	r.HandleFunc("/createUser", CreateUserHandler).Methods("POST", "OPTIONS")
 	r.HandleFunc("/getAllPods", GetAllPodsHandler).Methods("GET", "OPTIONS")
 
-	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"http://34.94.222.49:30001"}), handlers.AllowCredentials())(r)))
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"http://104.196.243.152:30001"}), handlers.AllowCredentials())(r)))
 }

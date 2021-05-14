@@ -66,5 +66,7 @@ export KUBECONFIG=`pwd`/infra/terraform/modules/kubernetes/config
 #### Miscelleanous commands
 - kubectl label node k8s-worker-0 type=worker
 - curl -X POST "https://us-west2-edge-platform-cmpe-295b.cloudfunctions.net/tf-to-tflite-converter-function" -H "Content-Type:application/json" --data '{"saved_model_dir_gcs":"sample_tf_model"}'
-- curl -X POST "http://localhost:8000/convertModel?email=akshay.elavia%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" -d '{"model_folder_name": "sample_tf_model",  "project_name": "Sample_Project"}'
-- curl -X POST "http://35.235.110.141:32000/deployModel?email=indiana.jones%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" --data '{"deployment_name":"test-deployment", "num_replicas": 2, "project_name": "object-detection"}'
+- curl -X POST "http://104.196.243.152:32000/convertModel?email=akshay.elavia%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" -d '{"model_folder_name": "sample_tf_model",  "project_name": "Sample_Project"}'
+- curl -X POST "http://104.196.243.152:32000/deployModel?email=akshay.elavia%40gmail.com" -H  "accept: application/json" -H  "Content-Type: application/json" --data '{"deployment_name":"test-deployment", "num_replicas": 2, "project_name": "Sample_Project", "gpu_support": true}'
+
+- curl -X POST "http://104.196.243.152:32000/createUser?email=akshay.elavia%40gmail.com"

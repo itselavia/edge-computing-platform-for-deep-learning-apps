@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: edge-frontend
-        image: aishwaryadeep07/final:dev
+        image: aishwaryadeep07/final
         ports:
         - containerPort: 3000
         envFrom:
