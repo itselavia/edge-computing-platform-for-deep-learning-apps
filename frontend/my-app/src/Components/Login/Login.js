@@ -10,7 +10,8 @@ class Login extends Component {
     constructor() {
         super();
         this.state = {
-            isSignedIn: false
+            isSignedIn: false,
+            error:false
         };
     }
 
@@ -38,7 +39,12 @@ class Login extends Component {
         // if(!props.auth.isAuthenticated && !props.auth.user.userExists) {
         //     this.props.history.push("/register");
         // }
-        if(props.auth.isAuthenticated && !props.auth.user.userExists) {
+        if(!!props.errors.hasError && props.errors.hasError===true) {
+            this.setState({
+                error:true
+            })
+        }
+        else if(props.auth.isAuthenticated && !props.auth.user.userExists) {
             this.props.history.push("/register");
         }
         else if(props.auth.isAuthenticated && props.auth.user.userExists) {
@@ -55,7 +61,14 @@ class Login extends Component {
 
     render() {
         var loginComponent;
-
+        var errorComponent;
+        let {error} = this.state;
+        if(error) {
+            errorComponent = (<h1>
+                Something went wrong during login!!
+            </h1>
+            )
+        }
         if (!this.state.isSignedIn) {
             loginComponent = (
                 <div className="container p-4">
@@ -73,6 +86,7 @@ class Login extends Component {
 
         return (
             <div>
+                {errorComponent}
                 {loginComponent}
             </div>
         );

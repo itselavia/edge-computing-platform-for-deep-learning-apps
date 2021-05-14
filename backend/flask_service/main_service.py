@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_mysqldb import MySQL
 from google.cloud import storage
 import jwt
@@ -8,14 +8,13 @@ from flask import jsonify, json
 import os
 import time
 import requests
-import os
 
 app = Flask(__name__)
 
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'platform')
 app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD',
                                               'EdgePlatform#Pass_999')
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '34.94.126.181')
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '35.236.202.116')
 app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'final_project_db')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -32,8 +31,10 @@ def index():
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin',
-                         'http://localhost:3001')
+    addr = "http://"
+    addr += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', 'localhost'))
+    addr += ":30001"
+    response.headers.add('Access-Control-Allow-Origin', addr)
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods',
@@ -45,7 +46,7 @@ def after_request(response):
 @app.route("/newUser", methods=['POST'])
 def newUser():
     reqData = request.json
-    print(reqData)
+    # print(reqData)
     name = reqData['name']
     email = reqData['email']
     phone = reqData['phone']
@@ -56,8 +57,8 @@ def newUser():
     if (userExists == 0):
         URL = "http://"
         URL += str(os.environ.get('MODEL_MANAGER_SERVICE_HOST', ''))
-        URL += ":"
-        URL += str(os.environ.get('MODEL_MANAGER_SERVICE_PORT', '32000'))
+        URL += ":32000"
+        # URL += str(os.environ.get('MODEL_MANAGER_PORT', '32000'))
         URL += "/createUser"
         print(URL)
 
@@ -278,8 +279,7 @@ def uploadModel():
     request.files["modelfile"].save("models/" + source_file_name)
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
-    bucket_name = os.environ.get('TF_BUCKET_NAME',
-                                 'edge-platform-cmpe-295b-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME', 'sjsu295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/modelfile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/modelfile/")
@@ -304,8 +304,7 @@ def uploadInference():
     request.files["inferencefile"].save("inferencefiles/" + source_file_name)
     storage_client = storage.Client()
     #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
-    bucket_name = os.environ.get('TF_BUCKET_NAME',
-                                 'edge-platform-cmpe-295b-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME', 'sjsu295b-tf-saved-models')
     bucket = storage_client.bucket(bucket_name)
     destination_blob_name = projectname + "/inferencefile/" + source_file_name
     blobs = bucket.list_blobs(prefix=projectname + "/inferencefile/")
@@ -318,6 +317,34 @@ def uploadInference():
     os.remove("inferencefiles/" + source_file_name)
     time.sleep(5)
     return "Inference uploaded", 201
+
+
+@app.route("/user/getConfig")
+def getConfig():
+    os.environ[
+        'GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/credentials.json'
+    username = request.args.get('username')
+    gcp_config_file_path = username + '/config'
+    # CHANGE SPECIFIC TO MAC, SHOULD BE CORRECTED
+    # config_dir_name = '/Users/vanditt/MyFiles/Studies_MS/SJSU_Sem_4/CMPE_295B/Project_repos/edge-computing-platform-for-deep-learning-apps/backend/flask_service/'
+    config_dir_name = '/app/'
+    config_dir_name += '/config_files/' + username
+    #CHANGE ENDS
+    destination_file_name = config_dir_name + '/config'
+    if not os.path.exists(config_dir_name):
+        os.makedirs(config_dir_name)
+    storage_client = storage.Client()
+    #bucket_name = os.environ.get('TF_BUCKET_NAME', 'edgecomputing-310003-tf-saved-models')
+    bucket_name = os.environ.get('TF_BUCKET_NAME', 'sjsu295b-tf-saved-models')
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(gcp_config_file_path)
+    blob.download_to_filename(destination_file_name)
+    try:
+        return send_file(destination_file_name,
+                         attachment_filename=destination_file_name)
+    except Exception as e:
+        return str(e)
+    return "convertModel", 201
 
 
 @app.route("/project/<id>/convertModel", methods=['POST'])

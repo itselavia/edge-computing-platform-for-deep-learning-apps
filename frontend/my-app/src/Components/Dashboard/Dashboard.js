@@ -5,12 +5,16 @@ import Container from 'react-bootstrap/Container'
 import Table from 'react-bootstrap/Table'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import Card from 'react-bootstrap/Card'
 import { Col, Row, Form, Dropdown, DropdownButton } from "react-bootstrap";
 import {uploadFile, getProjectUsers} from "../../redux/actions/authActions"
 import Loader from "react-loader-spinner";
 import AddUser from './AddUser';
 import DeployModal from './DeployModal';
+import axios from 'axios';
+import config from '../../config/app-config'
 
+// Axios.defaults.baseURL = config.api_host;
 class Dashboard extends Component {
     constructor() {
         super();
@@ -119,11 +123,25 @@ class Dashboard extends Component {
                 project_id : this.props.current_project.project_id
             }
             this.props.getProjectUsers(proj_info)
+            this.props.history.push('/projects');
         })
     }
 
     
-
+    handleInference = ()=> {
+        //http://127.0.0.1:5001
+        // console.log("The inference host url is"+config.inference_host)
+        axios.get(config.inference_host+"getResults", { params: { image_url: this.state.image_url } })
+        .then((response)=>{
+            this.setState({
+                objectResult:response.data[0]
+            })
+            console.log(response)
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+    }
 
     handleModalClose = ()=>{
         this.setState({showFileUpload: false})
@@ -148,6 +166,7 @@ class Dashboard extends Component {
     }
 
     render() {
+        let object_image = <div><img src={this.state.image_url} height={200} width={200}/> <br/></div>
         if(this.props.auth.loading) 
             return (
                 <Container fluid ="lg">
@@ -188,11 +207,23 @@ class Dashboard extends Component {
                 </Table>
                 <br/>
                 <Button variant="primary" size="lg" block onClick={this.fileUpload}>{this.state.deploy_button_text}</Button>
+                <br/>
+                <br/>
                 <Table>
-                    <th>Current Users Associated to this project</th>
+                    
+                    <tr>
+                        <th>Current Users Associated to this project</th>
+                        <td colSpan="4">
+                        
+                        </td>
+                        <td >
+                        <Button variant="primary" size="sm" block onClick={this.showAddUser}>Add User to project</Button>
+                        </td>
+                    </tr>
                     {this.state.users}
+                    
                 </Table>
-                <Button variant="primary" size="lg" block onClick={this.showAddUser}>Add User to project</Button>
+                
                 <AddUser onClose={this.showModal} showAddUser = {this.state.show}></AddUser>
                 <DeployModal onClose={this.launchDeployModal} showDepModal = {this.state.showDeployModal}></DeployModal>
                 <Modal
@@ -234,7 +265,43 @@ class Dashboard extends Component {
                     <Button variant="primary" onClick={this.deploymentModal}>Proceed</Button>
                     </Modal.Footer>
                 </Modal>
-
+            <br/>
+            <hr/>
+                {this.state.deploy_button_text === "Edit Deployment" &&
+                    (<Card>
+                         <Card.Header><b>Run Inference</b></Card.Header>
+                        <Card.Body>
+                    <Card.Text>
+                    <Form>
+                        <div>
+                            <Form.Row>
+                                <Form.Group as={Col} controlId="image_url">
+                                            <Form.Label>
+                                            <b>Image URL</b>
+                                            </Form.Label>
+                                            
+                                        
+                                        <Form.Control name="image_url"
+                                                type="text"
+                                                onChange={this.onChange}
+                                                placeholder="Enter the URL of image you want to detect"
+                                                
+                                            required />
+                                </Form.Group>     
+                            </Form.Row>
+                            <br/>
+                       </div>
+                       {this.state.image_url!=null && this.state.image_url!='' && object_image}
+                       
+                </Form>
+                </Card.Text>
+                <br/>
+                <Button variant="primary" size="sm" block onClick={this.handleInference}>Object Infer</Button>
+                <h1>&nbsp; {this.state.objectResult}</h1>
+                </Card.Body>
+                </Card>    
+                    )
+        }
             </Container>
         )
     }

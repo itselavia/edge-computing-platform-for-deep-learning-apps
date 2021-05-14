@@ -8,6 +8,7 @@ import DonutChart from 'react-donut-chart';
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { Col, Row ,Nav, Form} from 'react-bootstrap';
+import config from '../../config/app-config'
 import file from '../../kubeconfig-sa-cmpe295bedge.yaml'
 class MyProject extends Component {
     
@@ -36,7 +37,11 @@ class MyProject extends Component {
         this.props.history.push("/dashboard");
     }
     componentWillReceiveProps(props) {
-       
+        const styleObj = {
+            maxWidth: "10px",
+            wordBreak: "break-word"
+        }
+        
         this.setState({
             projects:props.projects.projects,
             pods:props.pods.pods
@@ -47,9 +52,9 @@ class MyProject extends Component {
                
             <React.Fragment>
                 <tr>
-                     <td onClick={()=>this.onProjectClick(proj)}>{proj.project_id}</td>
-                     <td>{proj.project_name}</td>
-                     <td>{proj.project_desc}</td>
+                     <td style={styleObj} onClick={()=>this.onProjectClick(proj)}><u><font color="cyan">  {proj.project_id}</font></u></td>
+                     <td >{proj.project_name}</td>
+                     <td style={styleObj}>{proj.project_desc}</td>
                 </tr>
                 
             </React.Fragment>
@@ -139,7 +144,7 @@ class MyProject extends Component {
           
             <Container fluid ="lg">
                 <br/>
-                <h1>Resource Summary</h1>
+                <h1>Platform Resource Summary</h1>
                 <br/>
                 <Table striped bordered hover responsive >
                     <thead>
@@ -161,7 +166,7 @@ class MyProject extends Component {
 
                    <Container>
                        <br/>
-                       <h4>Project Summary  <a href={file} download="kubeconfig-sa-cmpe295bedge.yaml">download config</a></h4>
+                       <h4>Project Summary  </h4>
                        <br/>
                        <Row xs={1} md={2}>
                            <Col >
@@ -189,7 +194,7 @@ class MyProject extends Component {
                 <h6>Steps for log and SSH:</h6>
                 <ol>
                 <li>install kubectl locally</li>
-                <li>download the config file</li>
+                <li><a href={config.api_host+"user/getConfig?username="+this.props.auth.user.email} download="kubeconfig-sa-cmpe295bedge.yaml">download </a> the config file</li>
                 <li>to view the logs of any pod:
                     kubectl logs POD_NAME --kubeconfig CONFIG_FILE_PATH</li>
                 <li>To ssh into the pod : kubectl exec -it POD_NAME --kubeconfig CONFIG_FILE_PATH -- /bin/sh</li>
